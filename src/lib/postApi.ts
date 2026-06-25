@@ -10,6 +10,7 @@ export interface CreatePostPayload {
   isResultHidden: boolean;
   resultRevealAt?: string;
   voteExpiresAt?: string;
+  imageUrls?: string[];
 }
 
 export const postApi = {

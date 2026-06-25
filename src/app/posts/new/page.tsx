@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { postApi } from '@/lib/postApi';
 import { CATEGORY_LABELS, CATEGORIES } from '@/types';
 import { useAuthStore } from '@/store/authStore';
+import MediaUploader from '@/components/MediaUploader';
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function NewPostPage() {
     voteExpiresAt: '',
   });
   const [options, setOptions] = useState(['', '']);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -73,6 +75,7 @@ export default function NewPostPage() {
         isResultHidden: form.isResultHidden,
         resultRevealAt: form.isResultHidden ? form.resultRevealAt : undefined,
         voteExpiresAt: form.voteExpiresAt || undefined,
+        imageUrls: mediaUrls.length > 0 ? mediaUrls : undefined,
       });
       router.push(`/posts/${data.id}`);
     } catch (e: any) {
@@ -162,6 +165,14 @@ export default function NewPostPage() {
               </button>
             )}
           </div>
+        </div>
+
+        {/* 사진/동영상 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            사진 / 동영상 <span className="text-xs font-normal text-gray-400">(선택 · 최대 5개)</span>
+          </label>
+          <MediaUploader onChange={setMediaUrls} />
         </div>
 
         {/* 옵션들 */}

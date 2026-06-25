@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/authApi';
@@ -20,8 +21,15 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-[#1a1d27] border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
-          모두의 문철
+        <Link href="/" className="flex items-center">
+          <Image
+            src={theme === 'dark' ? '/logo/header-dark-trans.png' : '/logo/header-light-trans.png'}
+            alt="모두의 문철"
+            width={160}
+            height={40}
+            className="h-9 w-auto"
+            priority
+          />
         </Link>
 
         <nav className="flex items-center gap-3 text-sm">
