@@ -1,0 +1,41 @@
+import api from './api';
+import { Post, PostSummary, Page, VoteResultResponse } from '@/types';
+
+export interface CreatePostPayload {
+  title: string;
+  content: string;
+  category: string;
+  isAnonymous: boolean;
+  voteOptions: string[];
+  isResultHidden: boolean;
+  resultRevealAt?: string;
+  voteExpiresAt?: string;
+}
+
+export const postApi = {
+  getPosts: (category?: string, page = 0, size = 20) =>
+    api.get<Page<PostSummary>>('/api/posts', {
+      params: { category, page, size, sort: 'createdAt,desc' },
+    }),
+
+  getPost: (id: number) => api.get<Post>(`/api/posts/${id}`),
+
+  createPost: (payload: CreatePostPayload) => api.post<Post>('/api/posts', payload),
+
+  deletePost: (id: number) => api.delete(`/api/posts/${id}`),
+
+  vote: (postId: number, optionId: number) =>
+    api.post<VoteResultResponse>(`/api/posts/${postId}/vote`, { optionId }),
+
+  getResult: (postId: number) =>
+    api.get<VoteResultResponse>(`/api/posts/${postId}/result`),
+
+  predict: (postId: number, optionId: number) =>
+    api.post(`/api/posts/${postId}/predict`, { optionId }),
+
+  getHotPosts: () => api.get<PostSummary[]>('/api/posts/hot'),
+
+  getClosingSoonPosts: () => api.get<PostSummary[]>('/api/posts/closing-soon'),
+
+  getPopularPosts: () => api.get<PostSummary[]>('/api/posts/popular'),
+};
