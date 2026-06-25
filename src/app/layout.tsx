@@ -1,10 +1,16 @@
 import type { Metadata } from 'next';
-import { Geist } from 'next/font/google';
+import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
+const notoSansKR = Noto_Sans_KR({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-noto-sans-kr',
+  display: 'swap',
+  preload: false,
+});
 
 export const metadata: Metadata = {
   title: '모두의 문철',
@@ -13,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={geist.variable} suppressHydrationWarning>
+    <html lang="ko" className={notoSansKR.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-gray-50 dark:bg-[#0f1117] transition-colors">
         <ThemeProvider>
           <Header />

@@ -1,67 +1,33 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PostSummary, CATEGORY_LABELS, CATEGORIES } from '@/types';
 import { postApi } from '@/lib/postApi';
 import PostCard from '@/components/PostCard';
-import CategoryFilter from '@/components/CategoryFilter';
 
 const CATEGORY_CONFIG: Record<string, { emoji: string; bg: string; border: string; text: string }> = {
-  LOVE:   { emoji: '💕', bg: 'bg-rose-50 dark:bg-rose-900/20',    border: 'border-rose-100 dark:border-rose-800',   text: 'text-rose-600 dark:text-rose-400' },
-  WORK:   { emoji: '💼', bg: 'bg-blue-50 dark:bg-blue-900/20',    border: 'border-blue-100 dark:border-blue-800',   text: 'text-blue-600 dark:text-blue-400' },
+  LOVE:   { emoji: '💕', bg: 'bg-rose-50 dark:bg-rose-900/20',    border: 'border-rose-100 dark:border-rose-800',    text: 'text-rose-600 dark:text-rose-400' },
+  WORK:   { emoji: '💼', bg: 'bg-blue-50 dark:bg-blue-900/20',    border: 'border-blue-100 dark:border-blue-800',    text: 'text-blue-600 dark:text-blue-400' },
   GAME:   { emoji: '🎮', bg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-100 dark:border-purple-800', text: 'text-purple-600 dark:text-purple-400' },
-  FAMILY: { emoji: '🏡', bg: 'bg-green-50 dark:bg-green-900/20',  border: 'border-green-100 dark:border-green-800', text: 'text-green-600 dark:text-green-400' },
+  FAMILY: { emoji: '🏡', bg: 'bg-green-50 dark:bg-green-900/20',  border: 'border-green-100 dark:border-green-800',  text: 'text-green-600 dark:text-green-400' },
   FRIEND: { emoji: '👫', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-100 dark:border-orange-800', text: 'text-orange-600 dark:text-orange-400' },
   DAILY:  { emoji: '☀️', bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-100 dark:border-yellow-800', text: 'text-yellow-600 dark:text-yellow-400' },
-  ETC:    { emoji: '💬', bg: 'bg-gray-50 dark:bg-gray-800',       border: 'border-gray-100 dark:border-gray-700',   text: 'text-gray-600 dark:text-gray-400' },
+  ETC:    { emoji: '💬', bg: 'bg-gray-50 dark:bg-gray-800',       border: 'border-gray-100 dark:border-gray-700',    text: 'text-gray-600 dark:text-gray-400' },
 };
 
 export default function HomePage() {
   const [hotPosts, setHotPosts] = useState<PostSummary[]>([]);
   const [popularPosts, setPopularPosts] = useState<PostSummary[]>([]);
   const [closingSoon, setClosingSoon] = useState<PostSummary[]>([]);
-  const [posts, setPosts] = useState<PostSummary[]>([]);
-  const [category, setCategory] = useState('전체');
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const latestRef = useRef<HTMLElement>(null);
+  const [latestPosts, setLatestPosts] = useState<PostSummary[]>([]);
 
   useEffect(() => {
     postApi.getHotPosts().then(({ data }) => setHotPosts(data)).catch(() => {});
     postApi.getPopularPosts().then(({ data }) => setPopularPosts(data)).catch(() => {});
     postApi.getClosingSoonPosts().then(({ data }) => setClosingSoon(data)).catch(() => {});
+    postApi.getPosts(undefined, 0).then(({ data }) => setLatestPosts(data.content.slice(0, 3))).catch(() => {});
   }, []);
-
-  const fetchPosts = useCallback(async (cat: string, pg: number, reset = false) => {
-    setLoading(true);
-    try {
-      const { data } = await postApi.getPosts(cat === '전체' ? undefined : cat, pg);
-      setPosts((prev) => reset ? data.content : [...prev, ...data.content]);
-      setHasMore(!data.last);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    setPage(0);
-    fetchPosts(category, 0, true);
-  }, [category, fetchPosts]);
-
-  const loadMore = () => {
-    const next = page + 1;
-    setPage(next);
-    fetchPosts(category, next);
-  };
-
-  const handleCategoryClick = (cat: string) => {
-    setCategory(cat);
-    setPage(0);
-    setTimeout(() => latestRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-  };
 
   return (
     <div className="space-y-8">
@@ -109,53 +75,56 @@ export default function HomePage() {
           {CATEGORIES.map((cat) => {
             const cfg = CATEGORY_CONFIG[cat];
             return (
-              <button
+              <Link
                 key={cat}
-                onClick={() => handleCategoryClick(cat)}
+                href={`/posts?category=${cat}`}
                 className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl border text-center transition hover:opacity-80
                   ${cfg.bg} ${cfg.border}`}
               >
                 <span className="text-xl">{cfg.emoji}</span>
                 <span className={`text-xs font-medium ${cfg.text}`}>{CATEGORY_LABELS[cat]}</span>
-              </button>
+              </Link>
             );
           })}
-          <button
-            onClick={() => handleCategoryClick('전체')}
+          <Link
+            href="/posts"
             className="flex flex-col items-center justify-center gap-1 py-3 rounded-xl border border-indigo-100 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 text-center transition hover:opacity-80"
           >
             <span className="text-xl">📋</span>
             <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">전체 보기</span>
-          </button>
+          </Link>
         </div>
       </section>
 
-      {/* 최신 사연 */}
-      <section ref={latestRef}>
-        <SectionHeader icon="📋" title="최신 사연" desc="방금 막 올라온 따끈따끈한 사연" />
-        <CategoryFilter selected={category} onChange={(cat) => { setCategory(cat); setPage(0); }} />
-        <div className="flex flex-col gap-2 mt-3">
-          {posts.length === 0 && !loading && (
-            <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-              <p className="text-4xl mb-3">📭</p>
-              <p>아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
-            </div>
-          )}
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-          {loading && (
-            <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">불러오는 중...</div>
-          )}
-          {!loading && hasMore && posts.length > 0 && (
-            <button
-              onClick={loadMore}
-              className="w-full py-3 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
-            >
-              더 보기
-            </button>
-          )}
+      {/* 최신 사연 미리보기 */}
+      <section>
+        <div className="flex items-end justify-between mb-3">
+          <SectionHeader icon="📋" title="최신 사연" desc="방금 막 올라온 따끈따끈한 사연" />
+          <Link
+            href="/posts"
+            className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mb-3"
+          >
+            전체 보기 →
+          </Link>
         </div>
+        {latestPosts.length === 0 ? (
+          <div className="text-center py-10 text-gray-400 dark:text-gray-500">
+            <p className="text-3xl mb-2">📭</p>
+            <p className="text-sm">아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {latestPosts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+            <Link
+              href="/posts"
+              className="block w-full py-3 text-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium border border-indigo-100 dark:border-indigo-800 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition"
+            >
+              사연 더 보기
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* 광고 */}

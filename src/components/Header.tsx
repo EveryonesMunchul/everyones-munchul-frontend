@@ -25,6 +25,10 @@ export default function Header() {
         </Link>
 
         <nav className="flex items-center gap-3 text-sm">
+          <Link href="/posts" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+            사연 보기
+          </Link>
+
           {/* 다크모드 토글 */}
           <button
             onClick={toggle}
