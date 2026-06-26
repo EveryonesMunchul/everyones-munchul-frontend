@@ -10,6 +10,8 @@ export function getTimeRemaining(isoDate: string | null | undefined): string {
   if (!isoDate) return '';
   const diff = new Date(isoDate).getTime() - Date.now();
   if (diff <= 0) return '마감';
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 60) return `${minutes}분`;
   const hours = Math.floor(diff / 3600000);
   if (hours < 24) return `${hours}시간`;
   return `D-${Math.floor(hours / 24)}`;

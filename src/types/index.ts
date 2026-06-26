@@ -23,6 +23,8 @@ export interface Post {
   voteOptions: VoteOption[];
   imageUrls: string[];
   createdAt: string;
+  hasVoted: boolean;
+  votedOptionId: number | null;
 }
 
 export interface PostSummary {

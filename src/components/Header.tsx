@@ -57,7 +57,12 @@ export default function Header() {
               >
                 사연 올리기
               </Link>
-              <span className="text-[#1c1c1e] dark:text-gray-200">{nickname}</span>
+              <Link
+                href="/my"
+                className="hover:text-[#1c1c1e] dark:hover:text-white transition-colors"
+              >
+                {nickname}
+              </Link>
               <button
                 onClick={handleLogout}
                 className="hover:text-[#1c1c1e] dark:hover:text-white transition-colors"
@@ -66,20 +71,12 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <>
-              <Link
-                href="/auth/login"
-                className="hover:text-[#1c1c1e] dark:hover:text-white transition-colors"
-              >
-                로그인
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="px-5 py-2 border border-[#1c1c1e] dark:border-gray-400 text-[#1c1c1e] dark:text-gray-200 rounded-full font-semibold hover:bg-[#f5f5f6] dark:hover:bg-gray-800 transition-colors"
-              >
-                회원가입
-              </Link>
-            </>
+            <Link
+              href="/auth/login"
+              className="px-5 py-2 border border-[#1c1c1e] dark:border-gray-400 text-[#1c1c1e] dark:text-gray-200 rounded-full font-semibold hover:bg-[#f5f5f6] dark:hover:bg-gray-800 transition-colors"
+            >
+              로그인
+            </Link>
           )}
         </nav>
       </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { postApi } from '@/lib/postApi';
 import { CATEGORY_LABELS, CATEGORIES } from '@/types';
 import { useAuthStore } from '@/store/authStore';
+import { extractErrorMessage } from '@/lib/errorUtils';
 import MediaUploader from '@/components/MediaUploader';
 
 export default function NewPostPage() {
@@ -18,7 +19,6 @@ export default function NewPostPage() {
     category: 'DAILY',
     isAnonymous: false,
     isResultHidden: false,
-    resultRevealAt: '',
     voteExpiresAt: '',
   });
   const [options, setOptions] = useState(['', '']);
@@ -35,6 +35,15 @@ export default function NewPostPage() {
   if (!mounted || !isLoggedIn) {
     return <div className="text-center py-20 text-gray-400 text-sm">로딩 중...</div>;
   }
+
+  // 현재 시각을 다음 30분 단위로 올림해서 datetime-local min 값으로 반환
+  const getMinDateTime = () => {
+    const now = new Date();
+    const ms = now.getTime();
+    const thirtyMin = 30 * 60 * 1000;
+    const rounded = new Date(Math.ceil(ms / thirtyMin) * thirtyMin);
+    return rounded.toISOString().slice(0, 16);
+  };
 
   const setField = (field: string, value: any) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -59,8 +68,12 @@ export default function NewPostPage() {
       setError('투표 항목을 2개 이상 입력해주세요');
       return;
     }
-    if (form.isResultHidden && !form.resultRevealAt) {
-      setError('결과 비공개 시 공개 일정을 설정해주세요');
+    if (form.isResultHidden && !form.voteExpiresAt) {
+      setError('결과 비공개 시 투표 마감 일시를 설정해주세요');
+      return;
+    }
+    if (form.voteExpiresAt && new Date(form.voteExpiresAt) <= new Date()) {
+      setError('투표 마감 일시는 현재 시각 이후로 설정해주세요');
       return;
     }
 
@@ -73,13 +86,12 @@ export default function NewPostPage() {
         isAnonymous: form.isAnonymous,
         voteOptions: filled,
         isResultHidden: form.isResultHidden,
-        resultRevealAt: form.isResultHidden ? form.resultRevealAt : undefined,
         voteExpiresAt: form.voteExpiresAt || undefined,
         imageUrls: mediaUrls.length > 0 ? mediaUrls : undefined,
       });
       router.push(`/posts/${data.id}`);
-    } catch (e: any) {
-      setError(e.response?.data?.message ?? '사연 등록에 실패했습니다');
+    } catch (e) {
+      setError(extractErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -188,23 +200,23 @@ export default function NewPostPage() {
             <input type="checkbox" checked={form.isResultHidden}
               onChange={(e) => setField('isResultHidden', e.target.checked)}
               className="w-4 h-4 accent-indigo-600" />
-            <span className="text-sm text-gray-700 dark:text-gray-300">투표 결과 비공개 (날짜 지정)</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">투표 결과 비공개 (마감일에 공개)</span>
           </label>
 
-          {form.isResultHidden && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">결과 공개 일시</label>
-              <input type="datetime-local" value={form.resultRevealAt}
-                onChange={(e) => setField('resultRevealAt', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            </div>
-          )}
-
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">투표 마감 일시 (선택)</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+              투표 마감 일시{form.isResultHidden ? ' (필수)' : ' (선택)'}
+            </label>
             <input type="datetime-local" value={form.voteExpiresAt}
               onChange={(e) => setField('voteExpiresAt', e.target.value)}
+              min={getMinDateTime()}
+              step={1800}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            {form.isResultHidden && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                투표 마감일에 결과가 자동 공개되며, 다수결과 같은 항목을 투표한 회원에게 경험치 +50이 지급됩니다.
+              </p>
+            )}
           </div>
         </div>
 

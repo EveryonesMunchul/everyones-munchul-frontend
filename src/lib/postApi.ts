@@ -8,7 +8,6 @@ export interface CreatePostPayload {
   isAnonymous: boolean;
   voteOptions: string[];
   isResultHidden: boolean;
-  resultRevealAt?: string;
   voteExpiresAt?: string;
   imageUrls?: string[];
 }
@@ -31,12 +30,12 @@ export const postApi = {
   getResult: (postId: number) =>
     api.get<VoteResultResponse>(`/api/posts/${postId}/result`),
 
-  predict: (postId: number, optionId: number) =>
-    api.post(`/api/posts/${postId}/predict`, { optionId }),
-
   getHotPosts: () => api.get<PostSummary[]>('/api/posts/hot'),
 
   getClosingSoonPosts: () => api.get<PostSummary[]>('/api/posts/closing-soon'),
 
   getPopularPosts: () => api.get<PostSummary[]>('/api/posts/popular'),
+
+  reportPost: (postId: number, reason: string) =>
+    api.post(`/api/posts/${postId}/report`, { reason }),
 };

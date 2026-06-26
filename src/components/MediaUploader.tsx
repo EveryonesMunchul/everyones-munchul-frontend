@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { uploadMedia } from '@/lib/uploadApi';
+import { extractErrorMessage } from '@/lib/errorUtils';
 
 const ACCEPTED = 'image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm';
 const MAX_FILES = 5;
@@ -78,7 +79,7 @@ export default function MediaUploader({ onChange }: Props) {
       .catch((err) => {
         setItems((prev) =>
           prev.map((m) =>
-            m.id === item.id ? { ...m, status: 'error' as const, error: err.message ?? '업로드 실패' } : m
+            m.id === item.id ? { ...m, status: 'error' as const, error: extractErrorMessage(err) } : m
           )
         );
       });

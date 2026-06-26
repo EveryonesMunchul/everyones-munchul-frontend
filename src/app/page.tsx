@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PostSummary, CATEGORY_LABELS, CATEGORIES } from '@/types';
-import { postApi } from '@/lib/postApi';
-import { formatDate, getTimeRemaining, isUrgent } from '@/lib/utils';
+import { CATEGORY_LABELS, CATEGORIES } from '@/types';
+import { isUrgent, getTimeRemaining } from '@/lib/utils';
+import { useHomePosts } from '@/hooks/useHomePosts';
+import BannerCarousel from '@/components/BannerCarousel';
+import MiniListRow from '@/components/MiniListRow';
 import {
   FlameIcon, HourglassIcon, HeartIcon, BriefcaseIcon,
   GamepadIcon, HouseIcon, PeopleIcon, SunIcon, ChatIcon,
-  LockIcon, MailboxIcon,
+  MailboxIcon,
 } from '@/components/Icons';
 
 const CATEGORY_ICON: Record<string, React.ReactNode> = {
@@ -22,15 +23,7 @@ const CATEGORY_ICON: Record<string, React.ReactNode> = {
 };
 
 export default function HomePage() {
-  const [hotPosts, setHotPosts] = useState<PostSummary[]>([]);
-  const [closingSoon, setClosingSoon] = useState<PostSummary[]>([]);
-  const [latestPosts, setLatestPosts] = useState<PostSummary[]>([]);
-
-  useEffect(() => {
-    postApi.getHotPosts().then(({ data }) => setHotPosts(data)).catch(() => {});
-    postApi.getClosingSoonPosts().then(({ data }) => setClosingSoon(data)).catch(() => {});
-    postApi.getPosts(undefined, 0).then(({ data }) => setLatestPosts(data.content.slice(0, 5))).catch(() => {});
-  }, []);
+  const { hotPosts, closingSoon, latestPosts } = useHomePosts();
 
   const featured = hotPosts[0];
   const hotList = hotPosts.slice(1, 6);
@@ -62,26 +55,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="p-10 bg-[#fafafa] dark:bg-[#111115]">
-            <div className="text-[11px] font-semibold tracking-[.2em] text-[#9a9aa0] uppercase mb-4">
-              마감 임박
-            </div>
-            {closingSoon.slice(0, 3).map((post) => (
-              <Link key={post.id} href={`/posts/${post.id}`}>
-                <div className="flex items-center justify-between py-4 border-b border-[#f2f2f2] dark:border-[#1e1e22] hover:bg-white/50 dark:hover:bg-white/5 -mx-3 px-3 rounded transition-colors cursor-pointer">
-                  <p className="text-[14px] font-medium text-[#1c1c1e] dark:text-white leading-snug max-w-[200px]">
-                    {post.title}
-                  </p>
-                  <span className="text-[12px] font-semibold text-[#5658d6] flex-none ml-3">
-                    {getTimeRemaining(post.voteExpiresAt as string)}
-                  </span>
-                </div>
-              </Link>
-            ))}
-            {closingSoon.length === 0 && (
-              <p className="text-[13px] text-[#9a9aa0] mt-2">마감 임박 사연이 없어요</p>
-            )}
-          </div>
+          <BannerCarousel posts={hotList} />
         </section>
       )}
 
@@ -99,7 +73,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="flex flex-col">
-            {hotList.length === 0 && hotPosts.length === 0 && (
+            {hotPosts.length === 0 && (
               <p className="text-[13px] text-[#9a9aa0]">사연을 불러오는 중...</p>
             )}
             {(hotList.length > 0 ? hotList : hotPosts).slice(0, 5).map((post, i) => (
@@ -134,25 +108,24 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="flex flex-col">
-            {closingSoon.slice(0, 4).map((post) => (
-              <Link key={post.id} href={`/posts/${post.id}`}>
-                <div className="py-3.5 px-2 -mx-2 rounded-lg hover:bg-[#fafafa] dark:hover:bg-white/5 transition-colors cursor-pointer border-b border-[#f2f2f2] dark:border-[#1e1e22] last:border-b-0">
-                  <p className="text-[14px] font-medium text-[#1c1c1e] dark:text-white leading-snug">
-                    {post.title}
-                  </p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-[12px] text-[#9a9aa0]">
-                      {post.totalVoteCount.toLocaleString()}명
-                    </span>
-                    <span className={`text-[12px] font-semibold ${isUrgent(post.voteExpiresAt) ? 'text-[#d65656]' : 'text-[#9a9aa0]'}`}>
-                      {getTimeRemaining(post.voteExpiresAt as string)}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-            {closingSoon.length === 0 && (
+            {closingSoon.length === 0 ? (
               <p className="text-[13px] text-[#9a9aa0]">마감 임박 사연이 없어요</p>
+            ) : (
+              closingSoon.slice(0, 4).map((post) => (
+                <Link key={post.id} href={`/posts/${post.id}`}>
+                  <div className="py-3.5 px-2 -mx-2 rounded-lg hover:bg-[#fafafa] dark:hover:bg-white/5 transition-colors cursor-pointer border-b border-[#f2f2f2] dark:border-[#1e1e22] last:border-b-0">
+                    <p className="text-[14px] font-medium text-[#1c1c1e] dark:text-white leading-snug">
+                      {post.title}
+                    </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-[12px] text-[#9a9aa0]">{post.totalVoteCount.toLocaleString()}명</span>
+                      <span className={`text-[12px] font-semibold ${isUrgent(post.voteExpiresAt) ? 'text-[#d65656]' : 'text-[#9a9aa0]'}`}>
+                        {getTimeRemaining(post.voteExpiresAt as string)}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))
             )}
           </div>
         </div>
@@ -173,10 +146,7 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
-          <Link
-            href="/posts"
-            className="mt-4 block text-center text-[12px] font-medium text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors"
-          >
+          <Link href="/posts" className="mt-4 block text-center text-[12px] font-medium text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
             전체 분야 →
           </Link>
         </div>
@@ -185,25 +155,19 @@ export default function HomePage() {
       {/* ===== 최신 사연 ===== */}
       <section className="mb-8">
         <div className="flex items-baseline justify-between mb-5">
-          <h2 className="text-[18px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.01em]">
-            최신 사연
-          </h2>
+          <h2 className="text-[18px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.01em]">최신 사연</h2>
           <Link href="/posts" className="text-[13px] text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
             전체 사연 →
           </Link>
         </div>
         {latestPosts.length === 0 ? (
           <div className="text-center py-12 text-[#9a9aa0]">
-            <div className="flex justify-center mb-3">
-              <MailboxIcon size={56} />
-            </div>
+            <div className="flex justify-center mb-3"><MailboxIcon size={56} /></div>
             <p className="text-[14px]">아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
           </div>
         ) : (
           <div className="border-t border-[#ececec] dark:border-[#2a2a2e]">
-            {latestPosts.map((post) => (
-              <MiniListRow key={post.id} post={post} />
-            ))}
+            {latestPosts.map((post) => <MiniListRow key={post.id} post={post} />)}
           </div>
         )}
       </section>
@@ -228,33 +192,5 @@ export default function HomePage() {
         광고 영역 · 광고 문의 ad@munchul.kr
       </div>
     </div>
-  );
-}
-
-function MiniListRow({ post }: { post: PostSummary }) {
-  const isExpired = post.voteExpiresAt && new Date(post.voteExpiresAt) < new Date();
-
-  return (
-    <Link href={`/posts/${post.id}`}>
-      <div className="flex items-center justify-between py-5 border-b border-[#f2f2f2] dark:border-[#1e1e22] hover:bg-[#fafafa] dark:hover:bg-white/5 -mx-2 px-2 transition-colors cursor-pointer">
-        <div className="flex-1 min-w-0 mr-6">
-          <div className="text-[11px] font-semibold tracking-[.16em] text-[#5658d6] uppercase mb-1.5">
-            {CATEGORY_LABELS[post.category] ?? post.category}
-          </div>
-          <p className="text-[16px] font-medium text-[#1c1c1e] dark:text-white leading-snug truncate">
-            {post.title}
-          </p>
-          <p className="text-[12px] text-[#9a9aa0] mt-1.5">
-            {post.authorNickname} · {post.totalVoteCount.toLocaleString()}명 · {formatDate(post.createdAt)}
-          </p>
-        </div>
-        <div className="flex-none flex items-center gap-2">
-          {post.isResultHidden && <LockIcon size={14} />}
-          {isExpired && (
-            <span className="text-[11px] font-medium text-[#9a9aa0]">마감</span>
-          )}
-        </div>
-      </div>
-    </Link>
   );
 }

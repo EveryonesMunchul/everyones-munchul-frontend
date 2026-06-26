@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
+import Toast from '@/components/Toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <Header />
           <main className="max-w-[1200px] mx-auto px-6 py-8">{children}</main>
+          <Toast />
         </ThemeProvider>
       </body>
     </html>
