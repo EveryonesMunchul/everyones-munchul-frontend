@@ -4,199 +4,257 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PostSummary, CATEGORY_LABELS, CATEGORIES } from '@/types';
 import { postApi } from '@/lib/postApi';
-import PostCard from '@/components/PostCard';
+import { formatDate, getTimeRemaining, isUrgent } from '@/lib/utils';
+import {
+  FlameIcon, HourglassIcon, HeartIcon, BriefcaseIcon,
+  GamepadIcon, HouseIcon, PeopleIcon, SunIcon, ChatIcon,
+  LockIcon, MailboxIcon,
+} from '@/components/Icons';
 
-const CATEGORY_CONFIG: Record<string, { emoji: string; bg: string; border: string; text: string }> = {
-  LOVE:   { emoji: '💕', bg: 'bg-rose-50 dark:bg-rose-900/20',    border: 'border-rose-100 dark:border-rose-800',    text: 'text-rose-600 dark:text-rose-400' },
-  WORK:   { emoji: '💼', bg: 'bg-blue-50 dark:bg-blue-900/20',    border: 'border-blue-100 dark:border-blue-800',    text: 'text-blue-600 dark:text-blue-400' },
-  GAME:   { emoji: '🎮', bg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-100 dark:border-purple-800', text: 'text-purple-600 dark:text-purple-400' },
-  FAMILY: { emoji: '🏡', bg: 'bg-green-50 dark:bg-green-900/20',  border: 'border-green-100 dark:border-green-800',  text: 'text-green-600 dark:text-green-400' },
-  FRIEND: { emoji: '👫', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-100 dark:border-orange-800', text: 'text-orange-600 dark:text-orange-400' },
-  DAILY:  { emoji: '☀️', bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-100 dark:border-yellow-800', text: 'text-yellow-600 dark:text-yellow-400' },
-  ETC:    { emoji: '💬', bg: 'bg-gray-50 dark:bg-gray-800',       border: 'border-gray-100 dark:border-gray-700',    text: 'text-gray-600 dark:text-gray-400' },
+const CATEGORY_ICON: Record<string, React.ReactNode> = {
+  LOVE:   <HeartIcon size={18} />,
+  WORK:   <BriefcaseIcon size={18} />,
+  GAME:   <GamepadIcon size={18} />,
+  FAMILY: <HouseIcon size={18} />,
+  FRIEND: <PeopleIcon size={18} />,
+  DAILY:  <SunIcon size={18} />,
+  ETC:    <ChatIcon size={18} />,
 };
 
 export default function HomePage() {
   const [hotPosts, setHotPosts] = useState<PostSummary[]>([]);
-  const [popularPosts, setPopularPosts] = useState<PostSummary[]>([]);
   const [closingSoon, setClosingSoon] = useState<PostSummary[]>([]);
   const [latestPosts, setLatestPosts] = useState<PostSummary[]>([]);
 
   useEffect(() => {
     postApi.getHotPosts().then(({ data }) => setHotPosts(data)).catch(() => {});
-    postApi.getPopularPosts().then(({ data }) => setPopularPosts(data)).catch(() => {});
     postApi.getClosingSoonPosts().then(({ data }) => setClosingSoon(data)).catch(() => {});
-    postApi.getPosts(undefined, 0).then(({ data }) => setLatestPosts(data.content.slice(0, 3))).catch(() => {});
+    postApi.getPosts(undefined, 0).then(({ data }) => setLatestPosts(data.content.slice(0, 5))).catch(() => {});
   }, []);
 
+  const featured = hotPosts[0];
+  const hotList = hotPosts.slice(1, 6);
+
   return (
-    <div className="space-y-8">
-
-      {/* 실시간 핫 글 */}
-      {hotPosts.length > 0 && (
-        <section>
-          <SectionHeader icon="🔥" title="실시간 핫 글" desc="투표가 가장 많이 몰린 사연" />
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-            {hotPosts.map((post, i) => (
-              <HotPostCard key={post.id} post={post} rank={i + 1} />
-            ))}
+    <div>
+      {/* ===== HERO ===== */}
+      {featured && (
+        <section className="grid grid-cols-[1.5fr_1fr] border border-[#ececec] dark:border-[#2a2a2e] rounded-sm overflow-hidden mb-0">
+          <div className="p-12 border-r border-[#ececec] dark:border-[#2a2a2e]">
+            <div className="text-[11px] font-semibold tracking-[.22em] text-[#5658d6] uppercase">
+              오늘의 사건 · {CATEGORY_LABELS[featured.category] ?? featured.category}
+            </div>
+            <h1 className="mt-5 text-[32px] font-semibold leading-[1.42] tracking-[-0.02em] text-[#1c1c1e] dark:text-white max-w-[540px]">
+              {featured.title}
+            </h1>
+            <div className="mt-5 flex items-center gap-4 text-[13px] text-[#9a9aa0]">
+              <span>{featured.authorNickname}</span>
+              <span className="w-1 h-1 rounded-full bg-[#d4d4d8]" />
+              <span>투표 {featured.totalVoteCount.toLocaleString()}명</span>
+              <span className="w-1 h-1 rounded-full bg-[#d4d4d8]" />
+              <span>조회 {featured.viewCount.toLocaleString()}</span>
+            </div>
+            <Link
+              href={`/posts/${featured.id}`}
+              className="mt-8 inline-block px-7 py-3.5 bg-[#1c1c1e] dark:bg-white text-white dark:text-[#1c1c1e] rounded-full text-[14px] font-semibold hover:opacity-80 transition-opacity"
+            >
+              판결 참여하기
+            </Link>
           </div>
-        </section>
-      )}
 
-      {/* 많이 본 사연 */}
-      {popularPosts.length > 0 && (
-        <section>
-          <SectionHeader icon="👁" title="많이 본 사연" desc="오늘 가장 많이 조회된 사연" />
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-            {popularPosts.map((post, i) => (
-              <HotPostCard key={post.id} post={post} rank={i + 1} showViews />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 마감 임박 */}
-      {closingSoon.length > 0 && (
-        <section>
-          <SectionHeader icon="⏰" title="투표 마감 임박" desc="곧 마감되는 사연, 지금 바로 참여하세요" />
-          <div className="flex flex-col gap-2">
-            {closingSoon.map((post) => (
-              <ClosingSoonCard key={post.id} post={post} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 카테고리 탐색 */}
-      <section>
-        <SectionHeader icon="🗂" title="카테고리별 탐색" desc="관심 있는 주제의 사연을 찾아보세요" />
-        <div className="grid grid-cols-4 gap-2">
-          {CATEGORIES.map((cat) => {
-            const cfg = CATEGORY_CONFIG[cat];
-            return (
-              <Link
-                key={cat}
-                href={`/posts?category=${cat}`}
-                className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl border text-center transition hover:opacity-80
-                  ${cfg.bg} ${cfg.border}`}
-              >
-                <span className="text-xl">{cfg.emoji}</span>
-                <span className={`text-xs font-medium ${cfg.text}`}>{CATEGORY_LABELS[cat]}</span>
+          <div className="p-10 bg-[#fafafa] dark:bg-[#111115]">
+            <div className="text-[11px] font-semibold tracking-[.2em] text-[#9a9aa0] uppercase mb-4">
+              마감 임박
+            </div>
+            {closingSoon.slice(0, 3).map((post) => (
+              <Link key={post.id} href={`/posts/${post.id}`}>
+                <div className="flex items-center justify-between py-4 border-b border-[#f2f2f2] dark:border-[#1e1e22] hover:bg-white/50 dark:hover:bg-white/5 -mx-3 px-3 rounded transition-colors cursor-pointer">
+                  <p className="text-[14px] font-medium text-[#1c1c1e] dark:text-white leading-snug max-w-[200px]">
+                    {post.title}
+                  </p>
+                  <span className="text-[12px] font-semibold text-[#5658d6] flex-none ml-3">
+                    {getTimeRemaining(post.voteExpiresAt as string)}
+                  </span>
+                </div>
               </Link>
-            );
-          })}
+            ))}
+            {closingSoon.length === 0 && (
+              <p className="text-[13px] text-[#9a9aa0] mt-2">마감 임박 사연이 없어요</p>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ===== DASHBOARD GRID ===== */}
+      <section className="grid grid-cols-[1fr_1fr_1fr] border-x border-b border-[#ececec] dark:border-[#2a2a2e] mb-8">
+        {/* 지금 뜨는 사연 */}
+        <div className="p-8 border-r border-[#ececec] dark:border-[#2a2a2e]">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="flex items-center gap-2 text-[15px] font-semibold text-[#1c1c1e] dark:text-white">
+              <FlameIcon size={22} />
+              <span>지금 뜨는 사연</span>
+            </h2>
+            <Link href="/posts" className="text-[12px] text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
+              더보기
+            </Link>
+          </div>
+          <div className="flex flex-col">
+            {hotList.length === 0 && hotPosts.length === 0 && (
+              <p className="text-[13px] text-[#9a9aa0]">사연을 불러오는 중...</p>
+            )}
+            {(hotList.length > 0 ? hotList : hotPosts).slice(0, 5).map((post, i) => (
+              <Link key={post.id} href={`/posts/${post.id}`}>
+                <div className="flex gap-4 items-baseline py-3.5 px-2 -mx-2 rounded-lg hover:bg-[#fafafa] dark:hover:bg-white/5 transition-colors cursor-pointer">
+                  <span className={`text-[17px] font-light w-4 flex-none tabular-nums ${i === 0 ? 'text-[#5658d6]' : 'text-[#c4c4c8]'}`}>
+                    {i + (hotList.length > 0 ? 2 : 1)}
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-medium text-[#1c1c1e] dark:text-white leading-snug">
+                      {post.title}
+                    </p>
+                    <p className="text-[12px] text-[#9a9aa0] mt-1">
+                      {CATEGORY_LABELS[post.category]} · {post.totalVoteCount.toLocaleString()}명 투표
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* 마감 임박 */}
+        <div className="p-8 border-r border-[#ececec] dark:border-[#2a2a2e]">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="flex items-center gap-2 text-[15px] font-semibold text-[#1c1c1e] dark:text-white">
+              <HourglassIcon size={22} />
+              <span>마감 임박</span>
+            </h2>
+            <Link href="/posts" className="text-[12px] text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
+              더보기
+            </Link>
+          </div>
+          <div className="flex flex-col">
+            {closingSoon.slice(0, 4).map((post) => (
+              <Link key={post.id} href={`/posts/${post.id}`}>
+                <div className="py-3.5 px-2 -mx-2 rounded-lg hover:bg-[#fafafa] dark:hover:bg-white/5 transition-colors cursor-pointer border-b border-[#f2f2f2] dark:border-[#1e1e22] last:border-b-0">
+                  <p className="text-[14px] font-medium text-[#1c1c1e] dark:text-white leading-snug">
+                    {post.title}
+                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-[12px] text-[#9a9aa0]">
+                      {post.totalVoteCount.toLocaleString()}명
+                    </span>
+                    <span className={`text-[12px] font-semibold ${isUrgent(post.voteExpiresAt) ? 'text-[#d65656]' : 'text-[#9a9aa0]'}`}>
+                      {getTimeRemaining(post.voteExpiresAt as string)}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {closingSoon.length === 0 && (
+              <p className="text-[13px] text-[#9a9aa0]">마감 임박 사연이 없어요</p>
+            )}
+          </div>
+        </div>
+
+        {/* 카테고리 */}
+        <div className="p-8 bg-[#fafafa] dark:bg-[#111115]">
+          <h2 className="text-[15px] font-semibold text-[#1c1c1e] dark:text-white mb-1">분야별 탐색</h2>
+          <p className="text-[12px] text-[#9a9aa0] mb-5">관심 있는 주제의 사연을 찾아보세요</p>
+          <div className="grid grid-cols-2 gap-2.5">
+            {CATEGORIES.slice(0, 6).map((cat) => (
+              <Link key={cat} href={`/posts?category=${cat}`}>
+                <div className="flex items-center gap-2 p-3 bg-white dark:bg-[#1a1d27] border border-[#ececec] dark:border-[#2a2a2e] rounded-lg hover:border-[#c8c8cc] dark:hover:border-[#4a4a4e] transition-colors cursor-pointer">
+                  <span className="flex-none">{CATEGORY_ICON[cat]}</span>
+                  <span className="text-[12px] font-semibold text-[#1c1c1e] dark:text-white">
+                    {CATEGORY_LABELS[cat]}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
           <Link
             href="/posts"
-            className="flex flex-col items-center justify-center gap-1 py-3 rounded-xl border border-indigo-100 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 text-center transition hover:opacity-80"
+            className="mt-4 block text-center text-[12px] font-medium text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors"
           >
-            <span className="text-xl">📋</span>
-            <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">전체 보기</span>
+            전체 분야 →
           </Link>
         </div>
       </section>
 
-      {/* 최신 사연 미리보기 */}
-      <section>
-        <div className="flex items-end justify-between mb-3">
-          <SectionHeader icon="📋" title="최신 사연" desc="방금 막 올라온 따끈따끈한 사연" />
-          <Link
-            href="/posts"
-            className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mb-3"
-          >
-            전체 보기 →
+      {/* ===== 최신 사연 ===== */}
+      <section className="mb-8">
+        <div className="flex items-baseline justify-between mb-5">
+          <h2 className="text-[18px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.01em]">
+            최신 사연
+          </h2>
+          <Link href="/posts" className="text-[13px] text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
+            전체 사연 →
           </Link>
         </div>
         {latestPosts.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 dark:text-gray-500">
-            <p className="text-3xl mb-2">📭</p>
-            <p className="text-sm">아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
+          <div className="text-center py-12 text-[#9a9aa0]">
+            <div className="flex justify-center mb-3">
+              <MailboxIcon size={56} />
+            </div>
+            <p className="text-[14px]">아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="border-t border-[#ececec] dark:border-[#2a2a2e]">
             {latestPosts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <MiniListRow key={post.id} post={post} />
             ))}
-            <Link
-              href="/posts"
-              className="block w-full py-3 text-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium border border-indigo-100 dark:border-indigo-800 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition"
-            >
-              사연 더 보기
-            </Link>
           </div>
         )}
       </section>
 
-      {/* 광고 */}
-      <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-6 text-center text-xs text-gray-400 dark:text-gray-600">
-        광고 영역
+      {/* ===== CTA ===== */}
+      <section className="py-14 text-center border border-[#ececec] dark:border-[#2a2a2e] rounded-sm mb-8">
+        <h2 className="text-[26px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.02em] leading-snug">
+          억울한 일, 혼자 끙끙 앓지 마세요
+        </h2>
+        <p className="mt-3.5 text-[15px] text-[#6a6a70] max-w-[480px] mx-auto leading-relaxed">
+          사연을 올리면 수천 명의 배심원이 당신의 이야기를 판결해 드립니다.
+        </p>
+        <Link href="/posts/new">
+          <button className="mt-7 px-9 py-4 bg-[#1c1c1e] dark:bg-white text-white dark:text-[#1c1c1e] rounded-full text-[15px] font-semibold hover:opacity-80 transition-opacity">
+            내 사연 올리기
+          </button>
+        </Link>
+      </section>
+
+      {/* ===== 광고 ===== */}
+      <div className="py-8 bg-[#fafafa] dark:bg-[#111115] border border-dashed border-[#d4d4d8] dark:border-[#2a2a2e] rounded-sm text-center text-[12px] text-[#b4b4b8] mb-2">
+        광고 영역 · 광고 문의 ad@munchul.kr
       </div>
     </div>
   );
 }
 
-function SectionHeader({ icon, title, desc }: { icon: string; title: string; desc?: string }) {
-  return (
-    <div className="mb-3">
-      <h2 className="flex items-center gap-1.5 text-base font-bold text-gray-900 dark:text-white">
-        <span>{icon}</span>
-        <span>{title}</span>
-      </h2>
-      {desc && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 ml-6">{desc}</p>}
-    </div>
-  );
-}
+function MiniListRow({ post }: { post: PostSummary }) {
+  const isExpired = post.voteExpiresAt && new Date(post.voteExpiresAt) < new Date();
 
-function HotPostCard({ post, rank, showViews = false }: { post: PostSummary; rank: number; showViews?: boolean }) {
-  const rankColor =
-    rank === 1 ? 'text-amber-500' :
-    rank === 2 ? 'text-gray-400' :
-    rank === 3 ? 'text-orange-400' : 'text-gray-300 dark:text-gray-600';
-
-  return (
-    <Link href={`/posts/${post.id}`} className="flex-shrink-0 w-40">
-      <div className="bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-gray-800 p-4 h-full hover:border-indigo-200 dark:hover:border-indigo-700 transition">
-        <div className="flex items-center gap-1.5 mb-2">
-          <span className={`text-sm font-bold tabular-nums ${rankColor}`}>{rank}</span>
-          <span className="text-xs px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full truncate">
-            {CATEGORY_LABELS[post.category] ?? post.category}
-          </span>
-        </div>
-        <p className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-3 mb-2 leading-snug">
-          {post.title}
-        </p>
-        <p className="text-xs text-gray-400 dark:text-gray-500">
-          {showViews ? `조회 ${post.viewCount.toLocaleString()}` : `투표 ${post.totalVoteCount.toLocaleString()}명`}
-        </p>
-      </div>
-    </Link>
-  );
-}
-
-function ClosingSoonCard({ post }: { post: PostSummary }) {
-  const remaining = getTimeRemaining(post.voteExpiresAt as string);
   return (
     <Link href={`/posts/${post.id}`}>
-      <div className="flex items-center justify-between bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 hover:border-amber-200 dark:hover:border-amber-700 transition">
-        <div className="flex-1 min-w-0 mr-3">
-          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{post.title}</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            투표 {post.totalVoteCount.toLocaleString()}명
+      <div className="flex items-center justify-between py-5 border-b border-[#f2f2f2] dark:border-[#1e1e22] hover:bg-[#fafafa] dark:hover:bg-white/5 -mx-2 px-2 transition-colors cursor-pointer">
+        <div className="flex-1 min-w-0 mr-6">
+          <div className="text-[11px] font-semibold tracking-[.16em] text-[#5658d6] uppercase mb-1.5">
+            {CATEGORY_LABELS[post.category] ?? post.category}
+          </div>
+          <p className="text-[16px] font-medium text-[#1c1c1e] dark:text-white leading-snug truncate">
+            {post.title}
+          </p>
+          <p className="text-[12px] text-[#9a9aa0] mt-1.5">
+            {post.authorNickname} · {post.totalVoteCount.toLocaleString()}명 · {formatDate(post.createdAt)}
           </p>
         </div>
-        <span className="flex-shrink-0 text-xs px-2.5 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full font-medium">
-          {remaining}
-        </span>
+        <div className="flex-none flex items-center gap-2">
+          {post.isResultHidden && <LockIcon size={14} />}
+          {isExpired && (
+            <span className="text-[11px] font-medium text-[#9a9aa0]">마감</span>
+          )}
+        </div>
       </div>
     </Link>
   );
-}
-
-function getTimeRemaining(isoDate: string): string {
-  const diff = new Date(isoDate).getTime() - Date.now();
-  if (diff <= 0) return '마감';
-  const hours = Math.floor(diff / 3600000);
-  if (hours < 24) return `${hours}시간 후`;
-  const days = Math.floor(hours / 24);
-  return `D-${days}`;
 }

@@ -1,16 +1,7 @@
 import type { Metadata } from 'next';
-import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import { ThemeProvider } from '@/components/ThemeProvider';
-
-const notoSansKR = Noto_Sans_KR({
-  weight: ['400', '500', '700'],
-  subsets: ['latin'],
-  variable: '--font-noto-sans-kr',
-  display: 'swap',
-  preload: false,
-});
 
 export const metadata: Metadata = {
   title: '모두의 문철',
@@ -19,11 +10,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={notoSansKR.variable} suppressHydrationWarning>
-      <body className="min-h-screen bg-gray-50 dark:bg-[#0f1117] transition-colors">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+        />
+      </head>
+      <body className="min-h-screen bg-white dark:bg-[#0f1117] transition-colors">
         <ThemeProvider>
           <Header />
-          <main className="max-w-3xl mx-auto px-4 py-6">{children}</main>
+          <main className="max-w-[1200px] mx-auto px-6 py-8">{children}</main>
         </ThemeProvider>
       </body>
     </html>

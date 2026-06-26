@@ -13,7 +13,7 @@ export default function CategoryFilter({ selected, onChange }: Props) {
   const categories = [ALL, ...Object.keys(CATEGORY_LABELS)];
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+    <div className="flex flex-wrap gap-6 border-b border-[#ececec] dark:border-[#2a2a2e] pb-4 mb-1">
       {categories.map((cat) => {
         const label = cat === ALL ? ALL : CATEGORY_LABELS[cat];
         const active = selected === cat;
@@ -21,10 +21,10 @@ export default function CategoryFilter({ selected, onChange }: Props) {
           <button
             key={cat}
             onClick={() => onChange(cat)}
-            className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
+            className={`text-[14px] font-medium pb-1 transition-colors border-b-2 -mb-[17px]
               ${active
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                ? 'text-[#1c1c1e] dark:text-white border-[#1c1c1e] dark:border-white font-semibold'
+                : 'text-[#9a9aa0] dark:text-[#6a6a70] border-transparent hover:text-[#1c1c1e] dark:hover:text-white'
               }`}
           >
             {label}

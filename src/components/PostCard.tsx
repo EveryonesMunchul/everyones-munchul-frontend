@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { PostSummary, CATEGORY_LABELS } from '@/types';
+import { formatDate } from '@/lib/utils';
+import { LockIcon } from '@/components/Icons';
 
 interface Props {
   post: PostSummary;
@@ -10,47 +12,38 @@ export default function PostCard({ post }: Props) {
 
   return (
     <Link href={`/posts/${post.id}`}>
-      <article className="bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-gray-800 p-5 hover:border-indigo-200 dark:hover:border-indigo-700 hover:shadow-sm transition cursor-pointer">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full font-medium">
+      <article className="grid grid-cols-[1fr_160px] gap-8 items-center py-7 border-b border-[#f2f2f2] dark:border-[#1e1e22] hover:bg-[#fafafa] dark:hover:bg-white/5 -mx-2 px-2 transition-colors cursor-pointer">
+        <div className="min-w-0">
+          <div className="text-[11px] font-semibold tracking-[.16em] text-[#5658d6] uppercase mb-2">
             {CATEGORY_LABELS[post.category] ?? post.category}
-          </span>
-          {post.isResultHidden && (
-            <span className="text-xs px-2 py-0.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full">
-              결과 비공개
-            </span>
-          )}
-          {isExpired && (
-            <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-full">
-              투표 마감
-            </span>
-          )}
+            {post.isResultHidden && (
+              <span className="ml-2 inline-flex items-center gap-1 text-[#9a9aa0] normal-case tracking-normal">
+                · <LockIcon size={12} /> 결과 비공개
+              </span>
+            )}
+            {isExpired && <span className="ml-2 text-[#9a9aa0] normal-case tracking-normal">· 마감</span>}
+          </div>
+          <h2 className="text-[17px] font-medium text-[#1c1c1e] dark:text-white leading-snug mb-1.5">
+            {post.title}
+          </h2>
+          <p className="text-[12px] text-[#9a9aa0]">
+            {post.authorNickname} · {post.totalVoteCount.toLocaleString()}명 · 조회 {post.viewCount.toLocaleString()} · {formatDate(post.createdAt)}
+          </p>
         </div>
 
-        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2">
-          {post.title}
-        </h2>
-
-        <div className="flex items-center justify-between text-sm text-gray-400 dark:text-gray-500">
-          <div className="flex items-center gap-3">
-            <span>{post.authorNickname}</span>
-            <span>투표 {post.totalVoteCount.toLocaleString()}명</span>
-            <span>조회 {post.viewCount.toLocaleString()}</span>
+        <div className="flex-none">
+          <div className="text-[12px] font-medium text-[#6a6a70] dark:text-[#9a9aa0] mb-2">
+            {post.totalVoteCount.toLocaleString()}명 투표
           </div>
-          <span>{formatDate(post.createdAt)}</span>
+          <div className="h-[3px] bg-[#f0f0f0] dark:bg-[#2a2a2e] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#1c1c1e] dark:bg-white rounded-full"
+              style={{ width: post.totalVoteCount > 0 ? '100%' : '0%', opacity: post.totalVoteCount > 0 ? 1 : 0 }}
+            />
+          </div>
         </div>
       </article>
     </Link>
   );
 }
 
-function formatDate(iso: string) {
-  const date = new Date(iso);
-  const now = new Date();
-  const diff = (now.getTime() - date.getTime()) / 1000;
-
-  if (diff < 60) return '방금 전';
-  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
-  return `${Math.floor(diff / 86400)}일 전`;
-}

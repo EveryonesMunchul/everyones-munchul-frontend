@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { uploadMedia } from '@/lib/uploadApi';
 
@@ -27,10 +27,16 @@ export default function MediaUploader({ onChange }: Props) {
   const [items, setItems] = useState<MediaFile[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const update = (next: MediaFile[]) => {
-    setItems(next);
-    onChange(next.filter((f) => f.status === 'done' && f.publicUrl).map((f) => f.publicUrl!));
-  };
+  // onChange를 ref로 관리 — items 변경 effect가 onChange 참조에 의존하지 않도록
+  const onChangeRef = useRef(onChange);
+  useEffect(() => { onChangeRef.current = onChange; });
+
+  // items가 변경될 때마다 완료된 URL 목록을 부모에 전달
+  useEffect(() => {
+    onChangeRef.current(
+      items.filter((f) => f.status === 'done' && f.publicUrl).map((f) => f.publicUrl!)
+    );
+  }, [items]);
 
   const addFiles = (files: FileList | null) => {
     if (!files) return;
@@ -59,35 +65,27 @@ export default function MediaUploader({ onChange }: Props) {
   };
 
   const startUpload = (item: MediaFile, current: MediaFile[]) => {
-    const withUploading = current.map((m) =>
+    setItems(current.map((m) =>
       m.id === item.id ? { ...m, status: 'uploading' as const } : m
-    );
-    setItems(withUploading);
+    ));
 
     uploadMedia(item.file)
       .then((publicUrl) => {
-        setItems((prev) => {
-          const next = prev.map((m) =>
-            m.id === item.id ? { ...m, status: 'done' as const, publicUrl } : m
-          );
-          onChange(next.filter((f) => f.status === 'done' && f.publicUrl).map((f) => f.publicUrl!));
-          return next;
-        });
+        setItems((prev) =>
+          prev.map((m) => m.id === item.id ? { ...m, status: 'done' as const, publicUrl } : m)
+        );
       })
       .catch((err) => {
-        setItems((prev) => {
-          const next = prev.map((m) =>
+        setItems((prev) =>
+          prev.map((m) =>
             m.id === item.id ? { ...m, status: 'error' as const, error: err.message ?? '업로드 실패' } : m
-          );
-          onChange(next.filter((f) => f.status === 'done' && f.publicUrl).map((f) => f.publicUrl!));
-          return next;
-        });
+          )
+        );
       });
   };
 
   const remove = (id: string) => {
-    const next = items.filter((m) => m.id !== id);
-    update(next);
+    setItems((prev) => prev.filter((m) => m.id !== id));
   };
 
   const onDrop = (e: React.DragEvent) => {

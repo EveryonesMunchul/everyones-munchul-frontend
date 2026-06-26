@@ -6,6 +6,7 @@ import { PostSummary } from '@/types';
 import { postApi } from '@/lib/postApi';
 import PostCard from '@/components/PostCard';
 import CategoryFilter from '@/components/CategoryFilter';
+import { MailboxIcon } from '@/components/Icons';
 
 function PostsContent() {
   const searchParams = useSearchParams();
@@ -41,25 +42,33 @@ function PostsContent() {
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       <CategoryFilter selected={category} onChange={(cat) => { setCategory(cat); setPage(0); }} />
-      <div className="flex flex-col gap-2">
+
+      <div className="mt-6">
         {posts.length === 0 && !loading && (
-          <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-            <p className="text-4xl mb-3">📭</p>
-            <p>아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
+          <div className="text-center py-20 text-[#9a9aa0]">
+            <div className="flex justify-center mb-3">
+              <MailboxIcon size={56} />
+            </div>
+            <p className="text-[14px]">아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
           </div>
         )}
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+
+        <div className="border-t border-[#ececec] dark:border-[#2a2a2e]">
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
+
         {loading && (
-          <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">불러오는 중...</div>
+          <div className="text-center py-10 text-[13px] text-[#9a9aa0]">불러오는 중...</div>
         )}
+
         {!loading && hasMore && posts.length > 0 && (
           <button
             onClick={loadMore}
-            className="w-full py-3 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+            className="w-full py-4 mt-2 text-[13px] font-medium text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors"
           >
             더 보기
           </button>
@@ -71,9 +80,16 @@ function PostsContent() {
 
 export default function PostsPage() {
   return (
-    <div className="space-y-5">
-      <h1 className="text-lg font-bold text-gray-900 dark:text-white">사연 목록</h1>
-      <Suspense fallback={<div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">불러오는 중...</div>}>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-[26px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.01em]">
+          사연 목록
+        </h1>
+        <p className="text-[13px] text-[#9a9aa0] mt-1">
+          모두의 사연에 판결을 내려보세요
+        </p>
+      </div>
+      <Suspense fallback={<div className="text-center py-10 text-[13px] text-[#9a9aa0]">불러오는 중...</div>}>
         <PostsContent />
       </Suspense>
     </div>

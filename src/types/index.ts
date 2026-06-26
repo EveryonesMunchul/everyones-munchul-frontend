@@ -12,6 +12,7 @@ export interface Post {
   content: string;
   category: string;
   isAnonymous: boolean;
+  authorId: number | null;
   authorNickname: string;
   viewCount: number;
   totalVoteCount: number;

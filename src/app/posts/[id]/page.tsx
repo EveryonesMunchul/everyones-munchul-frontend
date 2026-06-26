@@ -6,6 +6,7 @@ import { Post, VoteOption, CATEGORY_LABELS } from '@/types';
 import { postApi } from '@/lib/postApi';
 import { useAuthStore } from '@/store/authStore';
 import VoteSection from '@/components/VoteSection';
+import { CheckCircleIcon } from '@/components/Icons';
 
 export default function PostDetailPage() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ export default function PostDetailPage() {
 
   const handleVoted = (options: VoteOption[], total: number) => {
     if (!post) return;
-    setPost({ ...post, voteOptions: options, totalVoteCount: total, isResultVisible: true });
+    setPost({ ...post, voteOptions: options, totalVoteCount: total, isResultVisible: !post.isResultHidden });
   };
 
   const handleDelete = async () => {
@@ -37,73 +38,76 @@ export default function PostDetailPage() {
   };
 
   if (loading) {
-    return <div className="text-center py-20 text-gray-400 dark:text-gray-500">불러오는 중...</div>;
+    return (
+      <div className="text-center py-24 text-[#9a9aa0] text-[13px]">불러오는 중...</div>
+    );
   }
 
   if (!post) return null;
 
-  const isOwner = isLoggedIn && post.authorNickname !== '익명';
+  const isOwner = isLoggedIn && userId != null && post.authorId === userId;
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-[720px] mx-auto">
       {/* 뒤로가기 */}
       <button
         onClick={() => router.back()}
-        className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 flex items-center gap-1"
+        className="text-[13px] text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors flex items-center gap-1 mb-8"
       >
-        ← 목록으로
+        ← 목록
       </button>
 
-      {/* 게시글 */}
-      <article className="bg-white dark:bg-[#1a1d27] rounded-2xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
-        {/* 헤더 */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full font-medium">
-              {CATEGORY_LABELS[post.category] ?? post.category}
-            </span>
-            {post.isResultHidden && (
-              <span className="text-xs px-2 py-0.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full">
-                결과 비공개
-              </span>
-            )}
-          </div>
-          {isOwner && (
-            <button onClick={handleDelete} className="text-xs text-red-400 hover:text-red-600">
-              삭제
-            </button>
-          )}
-        </div>
+      {/* 카테고리 */}
+      <div className="text-[11px] font-semibold tracking-[.2em] text-[#5658d6] uppercase">
+        {CATEGORY_LABELS[post.category] ?? post.category}
+        {post.isResultHidden && <span className="ml-3 text-[#9a9aa0] normal-case tracking-normal">· 결과 비공개</span>}
+      </div>
 
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">{post.title}</h1>
+      {/* 제목 */}
+      <h1 className="mt-4 text-[30px] font-semibold text-[#1c1c1e] dark:text-white leading-[1.45] tracking-[-0.02em]">
+        {post.title}
+      </h1>
 
-        <div className="flex items-center gap-3 text-sm text-gray-400 dark:text-gray-500">
-          <span>{post.authorNickname}</span>
-          <span>조회 {post.viewCount.toLocaleString()}</span>
-          <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
-        </div>
+      {/* 메타 */}
+      <div className="flex items-center gap-3 text-[13px] text-[#9a9aa0] mt-4 pb-7 border-b border-[#ececec] dark:border-[#2a2a2e]">
+        <span>{post.authorNickname}</span>
+        <span className="w-1 h-1 rounded-full bg-[#d4d4d8]" />
+        <span>투표 {post.totalVoteCount.toLocaleString()}명</span>
+        <span className="w-1 h-1 rounded-full bg-[#d4d4d8]" />
+        <span>조회 {post.viewCount.toLocaleString()}</span>
+        <span className="w-1 h-1 rounded-full bg-[#d4d4d8]" />
+        <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
 
-        <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{post.content}</p>
-
-        {post.imageUrls.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
-            {post.imageUrls.map((url, i) => (
-              <img key={i} src={url} alt="" className="rounded-xl w-full object-cover max-h-60" />
-            ))}
-          </div>
+        {isOwner && (
+          <button
+            onClick={handleDelete}
+            className="ml-auto text-[12px] text-red-400 hover:text-red-600 transition-colors"
+          >
+            삭제
+          </button>
         )}
-      </article>
+      </div>
 
-      {/* 투표 섹션 */}
-      <div className="bg-white dark:bg-[#1a1d27] rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
-        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
-          투표해주세요 ({post.totalVoteCount.toLocaleString()}명 참여)
-        </h2>
+      {/* 본문 */}
+      <p className="text-[16px] leading-[1.9] text-[#3a3a40] dark:text-[#c0c0c6] mt-7 whitespace-pre-wrap">
+        {post.content}
+      </p>
+
+      {post.imageUrls.length > 0 && (
+        <div className="grid grid-cols-2 gap-2 mt-6">
+          {post.imageUrls.map((url, i) => (
+            <img key={i} src={url} alt="" className="rounded-lg w-full object-cover max-h-60" />
+          ))}
+        </div>
+      )}
+
+      {/* 투표 */}
+      <div className="mt-11 pt-9 pb-9 border-t border-[#ececec] dark:border-[#2a2a2e] border-b">
         <VoteSection post={post} onVoted={handleVoted} />
 
         {post.isResultHidden && !post.isResultVisible && isLoggedIn && (
-          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <div className="mt-8 pt-7 border-t border-[#ececec] dark:border-[#2a2a2e]">
+            <p className="text-[13px] text-[#9a9aa0] mb-4 text-center">
               결과가 공개되기 전에 다수결 결과를 예측해보세요! 맞추면 경험치 +50
             </p>
             <PredictSection postId={post.id} options={post.voteOptions} />
@@ -130,34 +134,46 @@ function PredictSection({ postId, options }: { postId: number; options: VoteOpti
   };
 
   if (done) {
-    return <p className="text-sm text-indigo-600 font-medium">✅ 예측 완료! 결과 공개 시 확인해보세요</p>;
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <CheckCircleIcon size={36} />
+        <p className="text-[13px] text-[#5658d6] font-semibold text-center">
+          예측 완료! 결과 공개 시 확인해보세요
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">다수결 결과 예측</p>
-      {options.map((opt) => (
+    <div className="space-y-2.5">
+      <p className="text-[13px] font-semibold text-[#1c1c1e] dark:text-white text-center mb-4">
+        다수결 결과 예측
+      </p>
+      <div className="flex flex-wrap justify-center gap-3">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            onClick={() => setSelected(opt.id)}
+            className={`px-6 py-3 rounded-full text-[13px] font-medium transition-all
+              ${selected === opt.id
+                ? 'bg-amber-500 text-white border border-amber-500'
+                : 'border border-[#d8d8d8] dark:border-[#3a3a3e] text-[#6a6a70] dark:text-[#9a9aa0] hover:border-amber-400'
+              }`}
+          >
+            {opt.content}
+          </button>
+        ))}
+      </div>
+      {error && <p className="text-[12px] text-red-500 text-center">{error}</p>}
+      <div className="text-center mt-4">
         <button
-          key={opt.id}
-          onClick={() => setSelected(opt.id)}
-          className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition
-            ${selected === opt.id
-              ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
-              : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-amber-300 dark:hover:border-amber-600'
-            }`}
+          onClick={handlePredict}
+          disabled={selected === null}
+          className="px-8 py-3 bg-amber-500 text-white rounded-full text-[13px] font-semibold disabled:opacity-30 hover:bg-amber-600 transition-colors"
         >
-          {opt.content}
+          예측하기
         </button>
-      ))}
-      {error && <p className="text-xs text-red-500">{error}</p>}
-      <button
-        onClick={handlePredict}
-        disabled={selected === null}
-        className="w-full py-2 bg-amber-500 text-white rounded-lg text-sm font-medium
-          disabled:opacity-40 hover:bg-amber-600 transition"
-      >
-        예측하기
-      </button>
+      </div>
     </div>
   );
 }
