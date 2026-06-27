@@ -1,8 +1,19 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
-export default function LoginPage() {
+function LoginContent() {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('error') === 'banned') {
+      alert('정지된 계정입니다.\ndev2say@gmail.com으로 문의해주세요.');
+    }
+  }, [searchParams]);
+
   return (
     <div className="min-h-[70vh] flex items-center justify-center">
       <div className="w-full max-w-sm">
@@ -17,6 +28,14 @@ export default function LoginPage() {
         </a>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   );
 }
 

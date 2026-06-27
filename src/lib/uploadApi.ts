@@ -6,9 +6,14 @@ interface PresignResponse {
   key: string;
 }
 
+function safeFileName(name: string): string {
+  // 경로 탐색 문자·널바이트 제거, 200자 제한
+  return name.replace(/[/\\:*?"<>|\x00]/g, '_').slice(0, 200) || 'upload';
+}
+
 async function uploadViaPresign(file: File): Promise<string> {
   const { data } = await api.post<PresignResponse>('/api/upload/presign', {
-    fileName: file.name,
+    fileName: safeFileName(file.name),
     contentType: file.type,
   });
   const res = await fetch(data.presignedUrl, {

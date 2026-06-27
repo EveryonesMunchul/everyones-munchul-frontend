@@ -50,15 +50,20 @@ export default function MyPage() {
 
   useEffect(() => {
     if (!isLoggedIn) { router.replace('/auth/login'); return; }
-    userApi.getProfile().then(r => {
-      setProfile(r.data);
-      setNicknameInput(r.data.nickname);
-    });
+    userApi.getProfile()
+      .then(r => {
+        setProfile(r.data);
+        setNicknameInput(r.data.nickname);
+      })
+      .catch(() => {
+        // 401은 인터셉터가 처리(forceLogout + 리다이렉트), 그 외 오류도 로그인 페이지로
+        router.replace('/auth/login');
+      });
   }, [isLoggedIn, router]);
 
   useEffect(() => {
     if (tab === 'stats' && !stats) {
-      userApi.getStats().then(r => setStats(r.data));
+      userApi.getStats().then(r => setStats(r.data)).catch(() => {});
     }
     if (tab === 'votes' && votes.length === 0) {
       loadVotes(0);
@@ -70,7 +75,7 @@ export default function MyPage() {
       setVotes(r.data.content);
       setVotesPage(r.data.number);
       setVotesTotalPages(r.data.totalPages);
-    });
+    }).catch(() => {});
   }, []);
 
   const handleNicknameSave = async () => {
@@ -89,12 +94,23 @@ export default function MyPage() {
     }
   };
 
+  const CONTACT_COOLDOWN_MS = 60_000;
+
   const handleContact = async (e: React.FormEvent) => {
     e.preventDefault();
     setContactError('');
+
+    const lastSent = localStorage.getItem('lastContactAt');
+    const elapsed = lastSent ? Date.now() - Number(lastSent) : Infinity;
+    if (elapsed < CONTACT_COOLDOWN_MS) {
+      setContactError(`${Math.ceil((CONTACT_COOLDOWN_MS - elapsed) / 1000)}초 후에 다시 보낼 수 있습니다`);
+      return;
+    }
+
     setContactLoading(true);
     try {
       await userApi.sendContact(contactSubject, contactBody);
+      localStorage.setItem('lastContactAt', String(Date.now()));
       setContactDone(true);
       setContactSubject('');
       setContactBody('');

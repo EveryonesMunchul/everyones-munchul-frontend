@@ -6,6 +6,10 @@ import { uploadMedia } from '@/lib/uploadApi';
 import { extractErrorMessage } from '@/lib/errorUtils';
 
 const ACCEPTED = 'image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm';
+const ACCEPTED_TYPES = new Set([
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+  'video/mp4', 'video/quicktime', 'video/webm',
+]);
 const MAX_FILES = 5;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;   // 10MB
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024;  // 100MB
@@ -49,13 +53,20 @@ export default function MediaUploader({ onChange }: Props) {
       const limit = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
       const limitLabel = isVideo ? '100MB' : '10MB';
 
+      let errorMsg: string | undefined;
+      if (!ACCEPTED_TYPES.has(file.type)) {
+        errorMsg = '지원하지 않는 형식입니다 (JPG·PNG·GIF·WEBP·MP4·MOV·WEBM)';
+      } else if (file.size > limit) {
+        errorMsg = `파일 크기는 ${limitLabel} 이하여야 합니다`;
+      }
+
       return {
         id: crypto.randomUUID(),
         file,
         preview: URL.createObjectURL(file),
         isVideo,
-        status: file.size > limit ? 'error' : 'pending',
-        error: file.size > limit ? `파일 크기는 ${limitLabel} 이하여야 합니다` : undefined,
+        status: errorMsg ? 'error' : 'pending',
+        error: errorMsg,
       };
     });
 

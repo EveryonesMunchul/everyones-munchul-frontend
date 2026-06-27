@@ -59,6 +59,8 @@ export default function NewPostPage() {
     if (options.length > 2) setOptions((prev) => prev.filter((_, idx) => idx !== i));
   };
 
+  const POST_COOLDOWN_MS = 30_000;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -77,6 +79,13 @@ export default function NewPostPage() {
       return;
     }
 
+    const lastPost = localStorage.getItem('lastPostAt');
+    const elapsed = lastPost ? Date.now() - Number(lastPost) : Infinity;
+    if (elapsed < POST_COOLDOWN_MS) {
+      setError(`${Math.ceil((POST_COOLDOWN_MS - elapsed) / 1000)}초 후에 다시 등록할 수 있습니다`);
+      return;
+    }
+
     setLoading(true);
     try {
       const { data } = await postApi.createPost({
@@ -89,6 +98,7 @@ export default function NewPostPage() {
         voteExpiresAt: form.voteExpiresAt || undefined,
         imageUrls: mediaUrls.length > 0 ? mediaUrls : undefined,
       });
+      localStorage.setItem('lastPostAt', String(Date.now()));
       router.push(`/posts/${data.id}`);
     } catch (e) {
       setError(extractErrorMessage(e));
@@ -144,10 +154,12 @@ export default function NewPostPage() {
             value={form.content}
             onChange={(e) => setField('content', e.target.value)}
             required
+            maxLength={3000}
             rows={5}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
             placeholder="사연을 자세히 적어주세요"
           />
+          <p className="text-right text-xs text-gray-400 mt-1">{form.content.length}/3000</p>
         </div>
 
         {/* 투표 항목 */}

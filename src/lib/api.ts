@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '@/store/authStore';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080',
@@ -12,6 +13,11 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+function forceLogout() {
+  useAuthStore.getState().logout();
+  window.location.href = '/auth/login';
+}
 
 api.interceptors.response.use(
   (res) => res,
@@ -32,9 +38,9 @@ api.interceptors.response.use(
         original.headers.Authorization = `Bearer ${data.accessToken}`;
         return api(original);
       } catch {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/auth/login';
+        forceLogout();
+        // 네비게이션 진행 중이므로 절대 resolve되지 않는 promise 반환 (downstream .then() 방지)
+        return new Promise(() => {});
       }
     }
     return Promise.reject(error);

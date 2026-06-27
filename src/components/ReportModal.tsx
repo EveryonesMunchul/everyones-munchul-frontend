@@ -30,8 +30,13 @@ export default function ReportModal({ postId, onClose }: Props) {
     try {
       await postApi.reportPost(postId, selected);
       setDone(true);
-    } catch (e) {
-      setError(extractErrorMessage(e));
+    } catch (e: any) {
+      // 이미 신고한 게시글이면 성공으로 처리
+      if (e?.response?.status === 409) {
+        setDone(true);
+      } else {
+        setError(extractErrorMessage(e));
+      }
     } finally {
       setLoading(false);
     }
