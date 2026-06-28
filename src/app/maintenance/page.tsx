@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import MiniGame from './MiniGame';
 
 export const metadata: Metadata = { title: '서비스 점검 중 | 모두의 문철' };
@@ -24,6 +25,8 @@ function fmt(iso: string) {
 
 export default async function MaintenancePage() {
   const data = await getMaintenance();
+
+  if (!data?.currentlyActive) redirect('/');
 
   return (
     <div className="h-screen overflow-hidden flex flex-col bg-[#f5f5f7] dark:bg-[#111115]">
