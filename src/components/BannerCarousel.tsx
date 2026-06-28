@@ -35,11 +35,7 @@ export default function BannerCarousel({ posts }: Props) {
   }, [posts.length]);
 
   if (posts.length === 0) {
-    return (
-      <div className="bg-[#fafafa] dark:bg-[#111115] flex items-center justify-center p-10 text-[13px] text-[#9a9aa0]">
-        이야기를 불러오는 중...
-      </div>
-    );
+    return null;
   }
 
   const post = posts[index];

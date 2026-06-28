@@ -32,8 +32,8 @@ export default function HomePage() {
     <div>
       {/* ===== HERO ===== */}
       {featured && (
-        <section className="grid grid-cols-[1.5fr_1fr] border border-[#ececec] dark:border-[#2a2a2e] rounded-sm overflow-hidden mb-0">
-          <div className="p-12 border-r border-[#ececec] dark:border-[#2a2a2e]">
+        <section className={`border border-[#ececec] dark:border-[#2a2a2e] rounded-sm overflow-hidden mb-0 ${hotList.length > 0 ? 'grid grid-cols-[1.5fr_1fr]' : ''}`}>
+          <div className={`p-12 ${hotList.length > 0 ? 'border-r border-[#ececec] dark:border-[#2a2a2e]' : ''}`}>
             <div className="text-[11px] font-semibold tracking-[.22em] text-[#5658d6] uppercase">
               오늘의 사건 · {CATEGORY_LABELS[featured.category] ?? featured.category}
             </div>
@@ -55,7 +55,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <BannerCarousel posts={hotList} />
+          {hotList.length > 0 && <BannerCarousel posts={hotList} />}
         </section>
       )}
 
