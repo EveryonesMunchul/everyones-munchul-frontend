@@ -44,6 +44,8 @@ export default function MiniGame() {
   const rows = useRef(12);
   const lh = useRef(COLS * CELL); // placeholder, overwritten on mount
 
+  const startGameRef = useRef<() => void>(() => {});
+
   const steer = useCallback((d: Dir) => {
     if (!g.current || g.current.phase !== 'play') return;
     if (d !== OPP[g.current.dir]) g.current.queue = d;
@@ -92,6 +94,7 @@ export default function MiniGame() {
       g.current.phase = 'play';
       g.current.last = performance.now();
     };
+    startGameRef.current = startGame;
 
     function tick() {
       const s = g.current!;
@@ -246,11 +249,7 @@ export default function MiniGame() {
       const d = MAP[e.key];
       if (!d) return;
       e.preventDefault();
-      if (g.current && g.current.phase !== 'play') {
-        // startGame은 useEffect 클로저 안에 있으므로 phase만 바꿈
-        g.current.phase = 'play';
-        g.current.last = performance.now();
-      }
+      if (g.current && g.current.phase !== 'play') startGameRef.current();
       steer(d);
     };
     window.addEventListener('keydown', fn);
@@ -273,10 +272,7 @@ export default function MiniGame() {
         const dy = e.changedTouches[0].clientY - touch.current.y;
         touch.current = null;
         if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        if (g.current && g.current.phase !== 'play') {
-          g.current.phase = 'play';
-          g.current.last = performance.now();
-        }
+        if (g.current && g.current.phase !== 'play') startGameRef.current();
         if (Math.abs(dx) > Math.abs(dy)) steer(dx > 0 ? 'R' : 'L');
         else steer(dy > 0 ? 'D' : 'U');
       }}
