@@ -4,9 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 
 const CELL = 30;
 const COLS = 20;
-const ROWS = 16;
-const LW = COLS * CELL;   // 600
-const LH = ROWS * CELL;   // 480
+// ROWS: 모바일(< 640px) = 16, 데스크탑 = 12
 
 const C = {
   bg: '#f5f5f7',
@@ -36,33 +34,18 @@ interface G {
 
 const OPP: Record<Dir, Dir> = { U: 'D', D: 'U', L: 'R', R: 'L' };
 
-function spawnFood(snake: Pt[]): Pt {
-  let p: Pt;
-  do { p = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) }; }
-  while (snake.some(s => s.x === p.x && s.y === p.y));
-  return p;
-}
-
-function init(hi = 0): G {
-  const snake = [{ x: 10, y: 8 }, { x: 9, y: 8 }, { x: 8, y: 8 }];
-  return { phase: 'idle', snake, dir: 'R', queue: 'R', food: spawnFood(snake), score: 0, hi, ms: 145, last: 0, pulse: 0 };
-}
-
 export default function MiniGame() {
   const cvs = useRef<HTMLCanvasElement>(null);
-  const g = useRef<G>(init());
+  const g = useRef<G | null>(null);
   const raf = useRef(0);
   const touch = useRef<Pt | null>(null);
   const isTouching = useRef(false);
-
-  const startGame = useCallback(() => {
-    g.current = init(g.current.hi);
-    g.current.phase = 'play';
-    g.current.last = performance.now();
-  }, []);
+  // 실제 사용되는 행 수와 캔버스 높이 (마운트 시 결정)
+  const rows = useRef(12);
+  const lh = useRef(COLS * CELL); // placeholder, overwritten on mount
 
   const steer = useCallback((d: Dir) => {
-    if (g.current.phase !== 'play') return;
+    if (!g.current || g.current.phase !== 'play') return;
     if (d !== OPP[g.current.dir]) g.current.queue = d;
   }, []);
 
@@ -75,21 +58,50 @@ export default function MiniGame() {
     return () => document.removeEventListener('touchmove', preventScroll);
   }, []);
 
-  /* ── 게임 루프 ───────────────────────────────── */
+  /* ── 게임 루프 (마운트 후 화면 크기 확정) ────── */
   useEffect(() => {
     const el = cvs.current;
     if (!el) return;
     const ctx = el.getContext('2d')!;
 
+    // 화면 크기에 따라 행 수 결정
+    rows.current = window.innerWidth < 640 ? 16 : 12;
+    lh.current = rows.current * CELL;
+    const LW = COLS * CELL;
+    const LH = lh.current;
+    el.width = LW;
+    el.height = LH;
+
+    function spawnFood(snake: Pt[]): Pt {
+      let p: Pt;
+      do { p = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * rows.current) }; }
+      while (snake.some(s => s.x === p.x && s.y === p.y));
+      return p;
+    }
+
+    function mkInit(hi = 0): G {
+      const midY = Math.floor(rows.current / 2);
+      const snake = [{ x: 10, y: midY }, { x: 9, y: midY }, { x: 8, y: midY }];
+      return { phase: 'idle', snake, dir: 'R', queue: 'R', food: spawnFood(snake), score: 0, hi, ms: 145, last: 0, pulse: 0 };
+    }
+
+    g.current = mkInit();
+
+    const startGame = () => {
+      g.current = mkInit(g.current?.hi ?? 0);
+      g.current.phase = 'play';
+      g.current.last = performance.now();
+    };
+
     function tick() {
-      const s = g.current;
+      const s = g.current!;
       s.dir = s.queue;
       const h = s.snake[0];
       const nx: Pt = {
         x: h.x + (s.dir === 'R' ? 1 : s.dir === 'L' ? -1 : 0),
         y: h.y + (s.dir === 'D' ? 1 : s.dir === 'U' ? -1 : 0),
       };
-      if (nx.x < 0 || nx.x >= COLS || nx.y < 0 || nx.y >= ROWS || s.snake.some(p => p.x === nx.x && p.y === nx.y)) {
+      if (nx.x < 0 || nx.x >= COLS || nx.y < 0 || nx.y >= rows.current || s.snake.some(p => p.x === nx.x && p.y === nx.y)) {
         s.phase = 'over';
         s.hi = Math.max(s.hi, s.score);
         return;
@@ -105,7 +117,7 @@ export default function MiniGame() {
     }
 
     function draw() {
-      const s = g.current;
+      const s = g.current!;
 
       ctx.fillStyle = C.bg;
       ctx.fillRect(0, 0, LW, LH);
@@ -119,7 +131,6 @@ export default function MiniGame() {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(LW, y); ctx.stroke();
       }
 
-      // 먹이
       const fx = s.food.x * CELL + CELL / 2;
       const fy = s.food.y * CELL + CELL / 2;
       const fr = 8.5 + Math.sin(s.pulse) * 2;
@@ -133,13 +144,11 @@ export default function MiniGame() {
       ctx.fillStyle = 'rgba(255,255,255,.4)';
       ctx.beginPath(); ctx.arc(fx - 2.5, fy - 2.5, fr * .38, 0, Math.PI * 2); ctx.fill();
 
-      // 뱀
       const total = s.snake.length;
       s.snake.forEach((pt, i) => {
         const px = pt.x * CELL, py = pt.y * CELL;
         const pad = i === 0 ? 1 : 3;
         const r = i === 0 ? 11 : 7;
-
         ctx.fillStyle = i === 0 ? C.head : C.body(i / total);
         ctx.beginPath();
         ctx.roundRect(px + pad, py + pad, CELL - pad * 2, CELL - pad * 2, r);
@@ -162,7 +171,6 @@ export default function MiniGame() {
         }
       });
 
-      // 점수
       ctx.font = '600 13px -apple-system,"Pretendard",monospace';
       ctx.textAlign = 'right';
       ctx.fillStyle = C.text;
@@ -172,7 +180,6 @@ export default function MiniGame() {
         ctx.fillText(`최고: ${s.hi}`, LW - 84, 19);
       }
 
-      // idle / over 오버레이
       if (s.phase !== 'play') {
         const isIdle = s.phase === 'idle';
         if (!isIdle) {
@@ -187,7 +194,6 @@ export default function MiniGame() {
           ctx.beginPath();
           ctx.roundRect(LW / 2 - 190, ty - 16, 380, 52, 10);
           ctx.fill();
-
           ctx.fillStyle = C.dark;
           ctx.font = 'bold 14px -apple-system,"Pretendard",sans-serif';
           ctx.fillText('방향키 / WASD로 이동 — 먹이를 먹어 길어지세요!', LW / 2, ty);
@@ -198,7 +204,6 @@ export default function MiniGame() {
           ctx.fillStyle = C.dark;
           ctx.font = 'bold 16px -apple-system,"Pretendard",sans-serif';
           ctx.fillText('GAME OVER', LW / 2, LH / 2 - 22);
-
           ctx.fillStyle = C.text;
           ctx.font = '13px -apple-system,"Pretendard",sans-serif';
           ctx.fillText(`점수: ${s.score}  ·  최고: ${s.hi}`, LW / 2, LH / 2 - 2);
@@ -208,7 +213,7 @@ export default function MiniGame() {
     }
 
     function loop(t: number) {
-      const s = g.current;
+      const s = g.current!;
       s.pulse += 0.08;
       if (s.phase === 'play' && t - s.last >= s.ms) {
         tick();
@@ -219,7 +224,15 @@ export default function MiniGame() {
     }
 
     raf.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf.current);
+
+    // 클릭/탭 핸들러를 여기서 등록 (startGame 접근 위해)
+    const handleClick = () => { if (g.current!.phase !== 'play') startGame(); };
+    el.addEventListener('click', handleClick);
+
+    return () => {
+      cancelAnimationFrame(raf.current);
+      el.removeEventListener('click', handleClick);
+    };
   }, []);
 
   /* ── 키보드 ──────────────────────────────────── */
@@ -233,21 +246,22 @@ export default function MiniGame() {
       const d = MAP[e.key];
       if (!d) return;
       e.preventDefault();
-      if (g.current.phase !== 'play') startGame();
+      if (g.current && g.current.phase !== 'play') {
+        // startGame은 useEffect 클로저 안에 있으므로 phase만 바꿈
+        g.current.phase = 'play';
+        g.current.last = performance.now();
+      }
       steer(d);
     };
     window.addEventListener('keydown', fn);
     return () => window.removeEventListener('keydown', fn);
-  }, [startGame, steer]);
+  }, [steer]);
 
   return (
     <canvas
       ref={cvs}
-      width={LW}
-      height={LH}
       className="w-full cursor-pointer sm:rounded-2xl border-y sm:border border-[#e4e4e7]"
       style={{ touchAction: 'none' }}
-      onClick={() => { if (g.current.phase !== 'play') startGame(); }}
       onTouchStart={e => {
         isTouching.current = true;
         touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -258,11 +272,11 @@ export default function MiniGame() {
         const dx = e.changedTouches[0].clientX - touch.current.x;
         const dy = e.changedTouches[0].clientY - touch.current.y;
         touch.current = null;
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
-          if (g.current.phase !== 'play') startGame();
-          return;
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+        if (g.current && g.current.phase !== 'play') {
+          g.current.phase = 'play';
+          g.current.last = performance.now();
         }
-        if (g.current.phase !== 'play') startGame();
         if (Math.abs(dx) > Math.abs(dy)) steer(dx > 0 ? 'R' : 'L');
         else steer(dy > 0 ? 'D' : 'U');
       }}
