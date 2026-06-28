@@ -101,11 +101,13 @@ export default function PostDetailPage() {
       </p>
 
       {post.imageUrls.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 mt-6">
+        <div className={`mt-6 ${post.imageUrls.length > 1 ? 'grid grid-cols-2 gap-2' : ''}`}>
           {post.imageUrls
             .filter((url) => { try { const p = new URL(url).protocol; return p === 'https:' || p === 'http:'; } catch { return false; } })
             .map((url, i) => (
-              <img key={i} src={url} alt="" className="rounded-lg w-full object-cover max-h-60" />
+              <div key={i} className="rounded-lg overflow-hidden bg-[#f5f5f7] dark:bg-[#1c1c1e]">
+                <img src={url} alt="" className="w-full h-auto max-h-[480px] object-contain" />
+              </div>
             ))}
         </div>
       )}
