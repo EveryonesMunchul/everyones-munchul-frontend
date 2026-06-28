@@ -79,14 +79,16 @@ export default async function MaintenancePage() {
       </div>
 
       {/* 게임 — 나머지 공간 전체 */}
-      <div className="flex-1 flex flex-col min-h-0 justify-center">
-        <p className="text-[11px] font-semibold text-[#c4c4c8] tracking-widest uppercase mb-2 text-center">
-          점검 중 미니게임
-        </p>
-        <MiniGame />
-        <p className="text-[11px] text-[#c4c4c8] text-center py-2">
-          방향키 / WASD · 모바일 스와이프
-        </p>
+      <div className="flex-1 flex flex-col items-center min-h-0 justify-center">
+        <div className="w-full sm:max-w-[660px]">
+          <p className="text-[11px] font-semibold text-[#c4c4c8] tracking-widest uppercase mb-2 text-center">
+            점검 중 미니게임
+          </p>
+          <MiniGame />
+          <p className="text-[11px] text-[#c4c4c8] text-center py-2">
+            방향키 / WASD · 모바일 스와이프
+          </p>
+        </div>
       </div>
 
     </div>
