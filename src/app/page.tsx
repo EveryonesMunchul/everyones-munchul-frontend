@@ -11,8 +11,7 @@ import { FlameIcon, HourglassIcon, ScaleIcon, MailboxIcon } from '@/components/I
 export default function HomePage() {
   const { featuredPost, hotPosts, closingSoon, latestPosts, tightPosts } = useHomePosts();
 
-  // 관리자가 고정한 게시글 우선, 없으면 가장 인기 있는 게시글
-  const featured = featuredPost ?? hotPosts[0];
+  const featured = featuredPost;
   const hotList = hotPosts.filter(p => p.id !== featured?.id).slice(0, 5);
 
   return (
