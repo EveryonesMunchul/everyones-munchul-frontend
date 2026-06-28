@@ -3,6 +3,7 @@ import { PostSummary, TightPost } from '@/types';
 import { postApi } from '@/lib/postApi';
 
 interface UseHomePostsResult {
+  featuredPost: PostSummary | null;
   hotPosts: PostSummary[];
   closingSoon: PostSummary[];
   latestPosts: PostSummary[];
@@ -11,6 +12,7 @@ interface UseHomePostsResult {
 }
 
 export function useHomePosts(): UseHomePostsResult {
+  const [featuredPost, setFeaturedPost] = useState<PostSummary | null>(null);
   const [hotPosts, setHotPosts] = useState<PostSummary[]>([]);
   const [closingSoon, setClosingSoon] = useState<PostSummary[]>([]);
   const [latestPosts, setLatestPosts] = useState<PostSummary[]>([]);
@@ -19,6 +21,7 @@ export function useHomePosts(): UseHomePostsResult {
 
   useEffect(() => {
     Promise.allSettled([
+      postApi.getFeaturedPost().then(({ data }) => setFeaturedPost(data)).catch(() => {}),
       postApi.getHotPosts().then(({ data }) => setHotPosts(data)),
       postApi.getClosingSoonPosts().then(({ data }) => setClosingSoon(data)),
       postApi.getPosts(undefined, 0).then(({ data }) => setLatestPosts(data.content.slice(0, 5))),
@@ -26,5 +29,5 @@ export function useHomePosts(): UseHomePostsResult {
     ]).finally(() => setLoading(false));
   }, []);
 
-  return { hotPosts, closingSoon, latestPosts, tightPosts, loading };
+  return { featuredPost, hotPosts, closingSoon, latestPosts, tightPosts, loading };
 }

@@ -38,6 +38,8 @@ export const postApi = {
 
   getTightPosts: () => api.get<TightPost[]>('/api/posts/tight'),
 
+  getFeaturedPost: () => api.get<PostSummary>('/api/posts/featured'),
+
   reportPost: (postId: number, reason: string) =>
     api.post(`/api/posts/${postId}/report`, { reason }),
 };

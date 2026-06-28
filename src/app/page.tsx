@@ -9,10 +9,11 @@ import MiniListRow from '@/components/MiniListRow';
 import { FlameIcon, HourglassIcon, ScaleIcon, MailboxIcon } from '@/components/Icons';
 
 export default function HomePage() {
-  const { hotPosts, closingSoon, latestPosts, tightPosts } = useHomePosts();
+  const { featuredPost, hotPosts, closingSoon, latestPosts, tightPosts } = useHomePosts();
 
-  const featured = hotPosts[0];
-  const hotList = hotPosts.slice(1, 6);
+  // 관리자가 고정한 게시글 우선, 없으면 가장 인기 있는 게시글
+  const featured = featuredPost ?? hotPosts[0];
+  const hotList = hotPosts.filter(p => p.id !== featured?.id).slice(0, 5);
 
   return (
     <div>
