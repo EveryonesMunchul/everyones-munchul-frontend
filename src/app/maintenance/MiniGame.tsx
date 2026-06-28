@@ -4,9 +4,9 @@ import { useEffect, useRef, useCallback } from 'react';
 
 const CELL = 30;
 const COLS = 20;
-const ROWS = 12;
+const ROWS = 16;
 const LW = COLS * CELL;   // 600
-const LH = ROWS * CELL;   // 360
+const LH = ROWS * CELL;   // 480
 
 const C = {
   bg: '#f5f5f7',
@@ -44,7 +44,7 @@ function spawnFood(snake: Pt[]): Pt {
 }
 
 function init(hi = 0): G {
-  const snake = [{ x: 10, y: 6 }, { x: 9, y: 6 }, { x: 8, y: 6 }];
+  const snake = [{ x: 10, y: 8 }, { x: 9, y: 8 }, { x: 8, y: 8 }];
   return { phase: 'idle', snake, dir: 'R', queue: 'R', food: spawnFood(snake), score: 0, hi, ms: 145, last: 0, pulse: 0 };
 }
 
