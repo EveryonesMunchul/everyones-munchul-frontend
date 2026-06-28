@@ -41,7 +41,7 @@ export default function BannerCarousel({ posts }: Props) {
   const post = posts[index];
 
   return (
-    <div className="relative bg-[#fafafa] dark:bg-[#111115] flex flex-col justify-between p-10 overflow-hidden select-none">
+    <div className="relative bg-[#fafafa] dark:bg-[#111115] flex flex-col justify-between p-10 overflow-hidden select-none h-full">
       <div
         style={{ opacity: fading ? 0 : 1, transition: 'opacity 0.2s ease' }}
         className="flex-1 flex flex-col"
@@ -49,7 +49,7 @@ export default function BannerCarousel({ posts }: Props) {
         <div className="text-[11px] font-semibold tracking-[.2em] text-[#5658d6] uppercase mb-3">
           {CATEGORY_LABELS[post.category] ?? post.category}
         </div>
-        <p className="text-[18px] font-semibold text-[#1c1c1e] dark:text-white leading-[1.45] tracking-[-0.01em] flex-1">
+        <p className="text-[18px] font-semibold text-[#1c1c1e] dark:text-white leading-[1.45] tracking-[-0.01em] flex-1 line-clamp-4">
           {post.title}
         </p>
         <div className="flex items-center gap-3 text-[12px] text-[#9a9aa0] mt-4">
