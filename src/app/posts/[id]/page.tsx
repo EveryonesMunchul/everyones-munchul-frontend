@@ -19,16 +19,20 @@ export default function PostDetailPage() {
   const { show: showToast } = useToastStore();
   const [reportOpen, setReportOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteConfirm) { setDeleteConfirm(true); return; }
+    if (isDeleting) return;
+    setIsDeleting(true);
     try {
       await postApi.deletePost(Number(id));
       router.push('/');
     } catch (e) {
       showToast(extractErrorMessage(e));
-    } finally {
       setDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -84,8 +88,8 @@ export default function PostDetailPage() {
             deleteConfirm ? (
               <span className="flex items-center gap-2 text-[12px]">
                 <span className="text-[#9a9aa0]">삭제할까요?</span>
-                <button onClick={handleDelete} className="text-red-500 font-medium hover:text-red-600">확인</button>
-                <button onClick={() => setDeleteConfirm(false)} className="text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white">취소</button>
+                <button onClick={handleDelete} disabled={isDeleting} className="text-red-500 font-medium hover:text-red-600 disabled:opacity-50">{isDeleting ? '삭제 중...' : '확인'}</button>
+                <button onClick={() => setDeleteConfirm(false)} disabled={isDeleting} className="text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white disabled:opacity-50">취소</button>
               </span>
             ) : (
               <button onClick={handleDelete} className="text-[12px] text-red-400 hover:text-red-600 transition-colors">

@@ -40,9 +40,9 @@ export default async function NoticePage() {
                 {notice.title}
               </span>
               <span className="shrink-0 text-[12px] text-[#9a9aa0] dark:text-[#6a6a70]">
-                {new Date(notice.createdAt).toLocaleDateString('ko-KR', {
+                {new Date(notice.createdAt + 'Z').toLocaleDateString('ko-KR', {
                   year: 'numeric', month: '2-digit', day: '2-digit',
-                }).replace(/\. /g, '.').replace('.', '')}
+                }).replace(/\.\s*/g, '.').replace(/\.$/, '')}
               </span>
             </div>
             <p className="text-[13px] text-[#6a6a70] dark:text-[#9a9aa0] leading-relaxed whitespace-pre-line">

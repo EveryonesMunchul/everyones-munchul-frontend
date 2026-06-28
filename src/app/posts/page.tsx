@@ -17,14 +17,17 @@ function PostsContent() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   const fetchPosts = useCallback(async (cat: string, pg: number, reset = false) => {
     setLoading(true);
+    if (reset) setFetchError(false);
     try {
       const { data } = await postApi.getPosts(cat === '전체' ? undefined : cat, pg);
       setPosts((prev) => reset ? data.content : [...prev, ...data.content]);
       setHasMore(!data.last);
     } catch {
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -46,7 +49,13 @@ function PostsContent() {
       <CategoryFilter selected={category} onChange={(cat) => { setCategory(cat); setPage(0); }} />
 
       <div className="mt-6">
-        {posts.length === 0 && !loading && (
+        {fetchError && (
+          <div className="text-center py-20 text-[#9a9aa0]">
+            <p className="text-[14px]">이야기를 불러오지 못했어요. 잠시 후 다시 시도해주세요.</p>
+          </div>
+        )}
+
+        {!fetchError && posts.length === 0 && !loading && (
           <div className="text-center py-20 text-[#9a9aa0]">
             <div className="flex justify-center mb-3">
               <MailboxIcon size={56} />
@@ -55,11 +64,13 @@ function PostsContent() {
           </div>
         )}
 
-        <div className="border-t border-[#ececec] dark:border-[#2a2a2e]">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </div>
+        {posts.length > 0 && (
+          <div className="border-t border-[#ececec] dark:border-[#2a2a2e]">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        )}
 
         {loading && (
           <div className="text-center py-10 text-[13px] text-[#9a9aa0]">불러오는 중...</div>

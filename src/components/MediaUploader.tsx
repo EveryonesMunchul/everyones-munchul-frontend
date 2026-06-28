@@ -97,7 +97,11 @@ export default function MediaUploader({ onChange }: Props) {
   };
 
   const remove = (id: string) => {
-    setItems((prev) => prev.filter((m) => m.id !== id));
+    setItems((prev) => {
+      const item = prev.find((m) => m.id === id);
+      if (item) URL.revokeObjectURL(item.preview);
+      return prev.filter((m) => m.id !== id);
+    });
   };
 
   const onDrop = (e: React.DragEvent) => {

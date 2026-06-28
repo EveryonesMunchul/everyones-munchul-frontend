@@ -26,7 +26,7 @@ export default function VoteSection({ post, onVoted }: Props) {
   const [voted, setVoted] = useState(post.hasVoted);
   const [retrying, setRetrying] = useState(false);
 
-  const isExpired = post.voteExpiresAt && new Date(post.voteExpiresAt) < new Date();
+  const isExpired = !!post.voteExpiresAt && new Date(post.voteExpiresAt + 'Z') < new Date();
 
   const handleVote = async () => {
     if (selected === null) return;
