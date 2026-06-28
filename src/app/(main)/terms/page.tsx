@@ -4,7 +4,7 @@ export const metadata = { title: '이용약관 | 모두의 문철' };
 
 export default function TermsPage() {
   return (
-    <PolicyLayout title="이용약관" lastUpdated="2025년 1월 1일">
+    <PolicyLayout title="이용약관" lastUpdated="2026년 6월 28일">
       <Section title="제1조 (목적)">
         <Item>
           본 약관은 모두의 문철(이하 "서비스")이 제공하는 모든 서비스의 이용 조건 및 절차, 이용자와
@@ -38,13 +38,19 @@ export default function TermsPage() {
         <Item>관련 법령 및 본 약관을 준수해야 합니다.</Item>
       </Section>
 
-      <Section title="제6조 (저작권)">
+      <Section title="제6조 (콘텐츠 보관 및 삭제)">
+        <Item>이용자가 직접 삭제한 이야기는 즉시 목록에서 숨겨지며, 삭제일로부터 60일 후 첨부 이미지·동영상 파일을 포함하여 서버에서 완전히 제거됩니다.</Item>
+        <Item>운영 정책 위반으로 관리자가 삭제한 이야기도 동일하게 60일 후 완전 삭제됩니다.</Item>
+        <Item>완전 삭제된 콘텐츠는 복구할 수 없습니다.</Item>
+      </Section>
+
+      <Section title="제7조 (저작권)">
         <Item>이용자가 서비스에 게시한 콘텐츠의 저작권은 해당 이용자에게 있습니다.</Item>
         <Item>이용자는 서비스 내 게시를 위해 서비스에 콘텐츠 사용 권한을 부여합니다.</Item>
         <Item>서비스가 제공하는 UI, 디자인, 로고 등의 저작권은 모두의 문철에 있습니다.</Item>
       </Section>
 
-      <Section title="제7조 (면책조항)">
+      <Section title="제8조 (면책조항)">
         <Item>서비스는 이용자 간 분쟁에 개입하지 않으며, 이로 인한 손해를 배상할 책임이 없습니다.</Item>
         <Item>서비스는 이용자가 게시한 콘텐츠의 정확성·신뢰성에 대해 보증하지 않습니다.</Item>
       </Section>
