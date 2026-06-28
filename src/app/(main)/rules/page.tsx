@@ -27,6 +27,7 @@ export default function RulesPage() {
         <Item>제목과 내용이 일치해야 하며, 낚시성 제목은 제재 대상입니다.</Item>
         <Item>동일한 내용의 게시물을 반복 작성하는 것은 금지됩니다.</Item>
         <Item>외부 링크 첨부 시 안전하고 신뢰할 수 있는 링크만 사용해 주세요.</Item>
+        <Item>불건전하거나 악성으로 판단되는 게시물은 별도 공지 없이 즉시 삭제될 수 있습니다.</Item>
       </Section>
 
       <Section title="제4조 (제재 기준)">
@@ -34,6 +35,7 @@ export default function RulesPage() {
         <Item>경고 3회 누적: 7일 이용 정지</Item>
         <Item>경고 5회 누적 또는 중대 위반: 영구 이용 정지</Item>
         <Item>불법 콘텐츠 게시 등 심각한 위반 행위는 즉시 영구 이용 정지 처리됩니다.</Item>
+        <Item>반복적인 규칙 위반 또는 커뮤니티에 해악을 끼치는 행위는 경고 횟수와 무관하게 계정이 정지될 수 있습니다.</Item>
       </Section>
 
       <Section title="제5조 (이의 신청)">
