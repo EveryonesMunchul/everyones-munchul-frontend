@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import Image from 'next/image';
 import MiniGame from './MiniGame';
 
 export const metadata: Metadata = { title: '서비스 점검 중 | 모두의 문철' };
@@ -28,26 +27,6 @@ export default async function MaintenancePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#f5f5f7] dark:bg-[#111115] py-12 gap-8 sm:px-6">
-
-      {/* 로고 배너 */}
-      <div className="flex flex-col items-center gap-1">
-        <Image
-          src="/logo/header-light-trans.png"
-          alt="모두의 문철"
-          width={180}
-          height={45}
-          className="h-9 w-auto dark:hidden"
-          priority
-        />
-        <Image
-          src="/logo/header-dark-trans.png"
-          alt="모두의 문철"
-          width={180}
-          height={45}
-          className="h-9 w-auto hidden dark:block"
-          priority
-        />
-      </div>
 
       {/* 미니게임 — 모바일 full-bleed */}
       <div className="w-full -mx-4 sm:mx-0 sm:max-w-[680px]">
