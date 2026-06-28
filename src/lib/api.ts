@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
+import { useToastStore } from '@/store/toastStore';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080',
@@ -43,6 +44,11 @@ api.interceptors.response.use(
         return new Promise(() => {});
       }
     }
+    if (error.response?.status === 429) {
+      useToastStore.getState().show('요청이 너무 많아요. 잠시 후 다시 시도해주세요.');
+      return new Promise(() => {});
+    }
+
     return Promise.reject(error);
   }
 );
