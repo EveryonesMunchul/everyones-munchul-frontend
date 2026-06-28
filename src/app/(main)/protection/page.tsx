@@ -10,7 +10,7 @@ export default function ProtectionPage() {
           모두의 문철은 청소년보호법에 따라 청소년이 유해 환경에 노출되지 않도록 최선을 다합니다.
         </Item>
         <Item>청소년 유해 콘텐츠가 발견될 경우 즉시 삭제 조치하며, 게시자의 계정을 제한합니다.</Item>
-        <Item>청소년 보호 책임자는 운영팀이며, 문의는 support@munchul.com으로 연락주시기 바랍니다.</Item>
+        <Item>청소년 보호 책임자는 운영팀이며, 문의는 dev2say@gmail.com으로 연락주시기 바랍니다.</Item>
       </Section>
 
       <Section title="제2조 (불법·유해 콘텐츠 차단)">
@@ -24,7 +24,7 @@ export default function ProtectionPage() {
       <Section title="제3조 (신고 및 처리 절차)">
         <Item>이용자는 문제가 되는 콘텐츠를 신고 기능을 통해 신고할 수 있습니다.</Item>
         <Item>신고된 콘텐츠는 운영팀이 검토 후 24시간 이내에 처리 결과를 안내합니다.</Item>
-        <Item>운영팀의 결정에 이의가 있는 경우 support@munchul.com으로 이의를 제기할 수 있습니다.</Item>
+        <Item>운영팀의 결정에 이의가 있는 경우 dev2say@gmail.com으로 이의를 제기할 수 있습니다.</Item>
       </Section>
 
       <Section title="제4조 (개인정보 보호)">

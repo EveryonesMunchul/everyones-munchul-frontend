@@ -4,7 +4,7 @@ export const metadata = { title: '개인정보처리방침 | 모두의 문철' }
 
 export default function PrivacyPage() {
   return (
-    <PolicyLayout title="개인정보처리방침" lastUpdated="2025년 1월 1일">
+    <PolicyLayout title="개인정보처리방침" lastUpdated="2026년 6월 28일">
       <Section title="제1조 (수집하는 개인정보 항목)">
         <Item>모두의 문철은 서비스 제공을 위해 아래와 같은 개인정보를 수집합니다.</Item>
         <Item>필수 항목: 이메일 주소, 닉네임, 소셜 로그인 식별자(OAuth ID)</Item>
@@ -24,6 +24,7 @@ export default function PrivacyPage() {
         <Item>단, 관련 법령에 따라 아래 정보는 일정 기간 보관됩니다.</Item>
         <Item>전자상거래 등에서 소비자 보호에 관한 법률: 계약·청약철회 기록 5년, 대금결제·재화공급 기록 5년, 소비자 불만·분쟁처리 기록 3년</Item>
         <Item>통신비밀보호법: 로그인 기록 3개월</Item>
+        <Item>이용자가 게시한 이야기(텍스트, 첨부 이미지·동영상)는 삭제 요청 또는 운영 정책에 의한 삭제일로부터 60일 후 서버에서 완전히 파기됩니다. 파기된 콘텐츠는 복구되지 않습니다.</Item>
       </Section>
 
       <Section title="제4조 (개인정보의 제3자 제공)">
@@ -34,12 +35,12 @@ export default function PrivacyPage() {
       <Section title="제5조 (이용자의 권리)">
         <Item>이용자는 언제든지 자신의 개인정보를 조회하거나 수정할 수 있습니다.</Item>
         <Item>회원 탈퇴를 통해 개인정보 삭제를 요청할 수 있습니다.</Item>
-        <Item>개인정보 처리에 관한 문의는 support@munchul.com으로 연락주시기 바랍니다.</Item>
+        <Item>개인정보 처리에 관한 문의는 dev2say@gmail.com으로 연락주시기 바랍니다.</Item>
       </Section>
 
       <Section title="제6조 (개인정보 보호책임자)">
         <Item>책임자: 모두의 문철 운영팀</Item>
-        <Item>이메일: support@munchul.com</Item>
+        <Item>이메일: dev2say@gmail.com</Item>
       </Section>
     </PolicyLayout>
   );
