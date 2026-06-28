@@ -37,6 +37,7 @@ export default function MyPage() {
   const [votesPage, setVotesPage] = useState(0);
   const [votesTotalPages, setVotesTotalPages] = useState(0);
 
+  const [profileError, setProfileError] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
   const [nicknameEditing, setNicknameEditing] = useState(false);
   const [nicknameLoading, setNicknameLoading] = useState(false);
@@ -55,9 +56,14 @@ export default function MyPage() {
         setProfile(r.data);
         setNicknameInput(r.data.nickname);
       })
-      .catch(() => {
-        // 401은 인터셉터가 처리(forceLogout + 리다이렉트), 그 외 오류도 로그인 페이지로
-        router.replace('/auth/login');
+      .catch((e) => {
+        const status = e?.response?.status;
+        // 401은 api.ts 인터셉터가 forceLogout 처리. 403도 인증 문제로 간주
+        if (status === 403) {
+          router.replace('/auth/login');
+        } else {
+          setProfileError('프로필을 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+        }
       });
   }, [isLoggedIn, router]);
 
@@ -120,6 +126,10 @@ export default function MyPage() {
       setContactLoading(false);
     }
   };
+
+  if (profileError) {
+    return <div className="min-h-[60vh] flex items-center justify-center text-[14px] text-red-400">{profileError}</div>;
+  }
 
   if (!profile) {
     return <div className="min-h-[60vh] flex items-center justify-center text-[14px] text-[#9a9aa0]">불러오는 중...</div>;
