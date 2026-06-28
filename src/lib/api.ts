@@ -45,7 +45,11 @@ api.interceptors.response.use(
       }
     }
     if (error.response?.status === 429) {
-      useToastStore.getState().show('요청이 너무 많아요. 잠시 후 다시 시도해주세요.');
+      const code = error.response.data?.code;
+      const msg = code === 'TOO_MANY_REQUESTS'
+        ? '요청이 너무 많아요. 잠시 후 다시 시도해주세요.'
+        : (error.response.data?.message ?? '요청이 너무 많아요. 잠시 후 다시 시도해주세요.');
+      useToastStore.getState().show(msg);
       return new Promise(() => {});
     }
 
