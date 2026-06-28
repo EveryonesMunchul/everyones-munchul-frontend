@@ -79,7 +79,7 @@ export default async function MaintenancePage() {
       </div>
 
       {/* 게임 — 나머지 공간 전체 */}
-      <div className="flex-1 flex flex-col min-h-0 justify-end">
+      <div className="flex-1 flex flex-col min-h-0 justify-center">
         <p className="text-[11px] font-semibold text-[#c4c4c8] tracking-widest uppercase mb-2 text-center">
           점검 중 미니게임
         </p>
