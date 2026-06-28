@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-white dark:bg-[#0f1117] transition-colors">
         <ThemeProvider>
           <Header />
-          <main className="max-w-[1200px] mx-auto px-6 py-8">{children}</main>
+          <main className="max-w-[1200px] mx-auto px-4 py-6 sm:px-6 sm:py-8">{children}</main>
           <Footer />
           <Toast />
         </ThemeProvider>

@@ -18,15 +18,15 @@ export default function HomePage() {
     <div>
       {/* ===== HERO ===== */}
       {featured && (
-        <section className={`border border-[#ececec] dark:border-[#2a2a2e] rounded-sm overflow-hidden mb-0 ${hotList.length > 0 ? 'grid grid-cols-[1.5fr_1fr]' : ''}`}>
-          <div className={`p-12 ${hotList.length > 0 ? 'border-r border-[#ececec] dark:border-[#2a2a2e]' : ''}`}>
+        <section className={`border border-[#ececec] dark:border-[#2a2a2e] rounded-sm overflow-hidden mb-0 ${hotList.length > 0 ? 'sm:grid sm:grid-cols-[1.5fr_1fr]' : ''}`}>
+          <div className={`p-6 sm:p-12 ${hotList.length > 0 ? 'sm:border-r border-[#ececec] dark:border-[#2a2a2e]' : ''}`}>
             <div className="text-[11px] font-semibold tracking-[.22em] text-[#5658d6] uppercase">
               오늘의 사건 · {CATEGORY_LABELS[featured.category] ?? featured.category}
             </div>
-            <h1 className="mt-5 text-[32px] font-semibold leading-[1.42] tracking-[-0.02em] text-[#1c1c1e] dark:text-white max-w-[540px]">
+            <h1 className="mt-4 sm:mt-5 text-[22px] sm:text-[32px] font-semibold leading-[1.42] tracking-[-0.02em] text-[#1c1c1e] dark:text-white sm:max-w-[540px]">
               {featured.title}
             </h1>
-            <div className="mt-5 flex items-center gap-4 text-[13px] text-[#9a9aa0]">
+            <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-2 sm:gap-4 text-[13px] text-[#9a9aa0]">
               <span>{featured.authorNickname}</span>
               <span className="w-1 h-1 rounded-full bg-[#d4d4d8]" />
               <span>투표 {featured.totalVoteCount.toLocaleString()}명</span>
@@ -35,20 +35,24 @@ export default function HomePage() {
             </div>
             <Link
               href={`/posts/${featured.id}`}
-              className="mt-8 inline-block px-7 py-3.5 bg-[#1c1c1e] dark:bg-white text-white dark:text-[#1c1c1e] rounded-full text-[14px] font-semibold hover:opacity-80 transition-opacity"
+              className="mt-6 sm:mt-8 inline-block px-7 py-3.5 bg-[#1c1c1e] dark:bg-white text-white dark:text-[#1c1c1e] rounded-full text-[14px] font-semibold hover:opacity-80 transition-opacity"
             >
               판결 참여하기
             </Link>
           </div>
 
-          {hotList.length > 0 && <BannerCarousel posts={hotList} />}
+          {hotList.length > 0 && (
+            <div className="hidden sm:block">
+              <BannerCarousel posts={hotList} />
+            </div>
+          )}
         </section>
       )}
 
       {/* ===== DASHBOARD GRID ===== */}
-      <section className="grid grid-cols-[1fr_1fr_1fr] border-x border-b border-[#ececec] dark:border-[#2a2a2e] mb-8">
+      <section className="grid sm:grid-cols-3 border-b sm:border-x border-[#ececec] dark:border-[#2a2a2e] mb-8">
         {/* 지금 뜨는 사연 */}
-        <div className="p-8 border-r border-[#ececec] dark:border-[#2a2a2e]">
+        <div className="p-6 sm:p-8 border-b sm:border-b-0 sm:border-r border-[#ececec] dark:border-[#2a2a2e]">
           <div className="flex items-center justify-between mb-5">
             <h2 className="flex items-center gap-2 text-[15px] font-semibold text-[#1c1c1e] dark:text-white">
               <FlameIcon size={22} />
@@ -83,7 +87,7 @@ export default function HomePage() {
         </div>
 
         {/* 마감 임박 */}
-        <div className="p-8 border-r border-[#ececec] dark:border-[#2a2a2e]">
+        <div className="p-6 sm:p-8 border-b sm:border-b-0 sm:border-r border-[#ececec] dark:border-[#2a2a2e]">
           <div className="flex items-center justify-between mb-5">
             <h2 className="flex items-center gap-2 text-[15px] font-semibold text-[#1c1c1e] dark:text-white">
               <HourglassIcon size={22} />
@@ -117,7 +121,7 @@ export default function HomePage() {
         </div>
 
         {/* 팽팽한 대결 */}
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between mb-5">
             <h2 className="flex items-center gap-2 text-[15px] font-semibold text-[#1c1c1e] dark:text-white">
               <ScaleIcon size={22} />
@@ -176,8 +180,8 @@ export default function HomePage() {
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="py-14 text-center border border-[#ececec] dark:border-[#2a2a2e] rounded-sm mb-8">
-        <h2 className="text-[26px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.02em] leading-snug">
+      <section className="py-10 sm:py-14 px-4 text-center border border-[#ececec] dark:border-[#2a2a2e] rounded-sm mb-8">
+        <h2 className="text-[20px] sm:text-[26px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.02em] leading-snug">
           억울한 일, 혼자 끙끙 앓지 마세요
         </h2>
         <p className="mt-3.5 text-[15px] text-[#6a6a70] max-w-[480px] mx-auto leading-relaxed">

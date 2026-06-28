@@ -62,11 +62,11 @@ export default function PostDetailPage() {
         )}
       </div>
 
-      <h1 className="mt-4 text-[30px] font-semibold text-[#1c1c1e] dark:text-white leading-[1.45] tracking-[-0.02em]">
+      <h1 className="mt-4 text-[22px] sm:text-[30px] font-semibold text-[#1c1c1e] dark:text-white leading-[1.45] tracking-[-0.02em]">
         {post.title}
       </h1>
 
-      <div className="flex items-center gap-3 text-[13px] text-[#9a9aa0] mt-4 pb-7 border-b border-[#ececec] dark:border-[#2a2a2e]">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[13px] text-[#9a9aa0] mt-4 pb-7 border-b border-[#ececec] dark:border-[#2a2a2e]">
         <span>{post.authorNickname}</span>
         <span className="w-1 h-1 rounded-full bg-[#d4d4d8]" />
         <span>투표 {post.totalVoteCount.toLocaleString()}명</span>
@@ -105,7 +105,7 @@ export default function PostDetailPage() {
       </p>
 
       {post.imageUrls.length > 0 && (
-        <div className={`mt-6 ${post.imageUrls.length > 1 ? 'grid grid-cols-2 gap-2' : ''}`}>
+        <div className={`mt-6 ${post.imageUrls.length > 1 ? 'grid grid-cols-1 sm:grid-cols-2 gap-2' : ''}`}>
           {post.imageUrls
             .filter((url) => { try { const p = new URL(url).protocol; return p === 'https:' || p === 'http:'; } catch { return false; } })
             .map((url, i) => (

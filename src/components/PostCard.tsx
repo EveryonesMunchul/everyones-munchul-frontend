@@ -12,8 +12,8 @@ export default function PostCard({ post }: Props) {
 
   return (
     <Link href={`/posts/${post.id}`}>
-      <article className="grid grid-cols-[1fr_160px] gap-8 items-center py-7 border-b border-[#f2f2f2] dark:border-[#1e1e22] hover:bg-[#fafafa] dark:hover:bg-white/5 -mx-2 px-2 transition-colors cursor-pointer">
-        <div className="min-w-0">
+      <article className="flex items-center gap-4 sm:gap-8 py-6 sm:py-7 border-b border-[#f2f2f2] dark:border-[#1e1e22] hover:bg-[#fafafa] dark:hover:bg-white/5 -mx-2 px-2 transition-colors cursor-pointer">
+        <div className="min-w-0 flex-1">
           <div className="text-[11px] font-semibold tracking-[.16em] text-[#5658d6] uppercase mb-2">
             {CATEGORY_LABELS[post.category] ?? post.category}
             {post.isResultHidden && (
@@ -31,7 +31,7 @@ export default function PostCard({ post }: Props) {
           </p>
         </div>
 
-        <div className="flex-none">
+        <div className="hidden sm:block flex-none w-[160px]">
           <div className="text-[12px] font-medium text-[#6a6a70] dark:text-[#9a9aa0] mb-2">
             {post.totalVoteCount.toLocaleString()}명 투표
           </div>
