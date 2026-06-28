@@ -29,7 +29,7 @@ const PROVIDER_LABEL: Record<string, string> = {
 
 export default function MyPage() {
   const router = useRouter();
-  const { isLoggedIn, nickname: storeNickname, login } = useAuthStore();
+  const { isLoggedIn, nickname: storeNickname, login, _hasHydrated } = useAuthStore();
   const [tab, setTab] = useState<Tab>('profile');
   const [profile, setProfile] = useState<MyProfile | null>(null);
   const [stats, setStats] = useState<MyStats | null>(null);
@@ -53,6 +53,7 @@ export default function MyPage() {
   const [contactError, setContactError] = useState('');
 
   useEffect(() => {
+    if (!_hasHydrated) return;
     if (!isLoggedIn) { router.replace('/auth/login'); return; }
     userApi.getProfile()
       .then(r => {
@@ -68,7 +69,7 @@ export default function MyPage() {
           setProfileError('프로필을 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
         }
       });
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn, _hasHydrated, router]);
 
   useEffect(() => {
     if (tab === 'stats' && !stats) {
@@ -132,6 +133,10 @@ export default function MyPage() {
       setContactLoading(false);
     }
   };
+
+  if (!_hasHydrated) {
+    return <div className="min-h-[60vh] flex items-center justify-center text-[14px] text-[#9a9aa0]">불러오는 중...</div>;
+  }
 
   if (profileError) {
     return <div className="min-h-[60vh] flex items-center justify-center text-[14px] text-red-400">{profileError}</div>;
