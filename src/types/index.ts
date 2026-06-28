@@ -56,6 +56,17 @@ export interface TightPost {
   createdAt: string;
 }
 
+export interface AdjacentPost {
+  id: number;
+  title: string;
+  category: string;
+}
+
+export interface AdjacentPostsResponse {
+  prev: AdjacentPost | null;
+  next: AdjacentPost | null;
+}
+
 export interface Page<T> {
   content: T[];
   totalElements: number;

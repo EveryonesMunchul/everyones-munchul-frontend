@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { CATEGORY_LABELS } from '@/types';
+import Link from 'next/link';
+import { CATEGORY_LABELS, AdjacentPostsResponse } from '@/types';
 import { postApi } from '@/lib/postApi';
 import { useAuthStore } from '@/store/authStore';
 import { usePost } from '@/hooks/usePost';
@@ -20,6 +21,13 @@ export default function PostDetailPage() {
   const [reportOpen, setReportOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [adjacent, setAdjacent] = useState<AdjacentPostsResponse | null>(null);
+
+  useEffect(() => {
+    postApi.getAdjacentPosts(Number(id))
+      .then(res => setAdjacent(res.data))
+      .catch(() => {});
+  }, [id]);
 
   const handleDelete = async () => {
     if (!deleteConfirm) { setDeleteConfirm(true); return; }
@@ -119,6 +127,53 @@ export default function PostDetailPage() {
       <div className="mt-11 pt-9 pb-9 border-t border-[#ececec] dark:border-[#2a2a2e] border-b">
         <VoteSection post={post} onVoted={updateVoteResult} />
       </div>
+
+      {/* 이전/다음 이야기 네비게이션 */}
+      {adjacent && (adjacent.prev || adjacent.next) && (
+        <nav className="mt-3 border-b border-[#ececec] dark:border-[#2a2a2e]">
+          <div className="grid grid-cols-1 sm:grid-cols-2">
+            {adjacent.prev ? (
+              <Link
+                href={`/posts/${adjacent.prev.id}`}
+                className="group flex flex-col gap-1.5 px-1 py-5 sm:pr-8 border-b sm:border-b-0 sm:border-r border-[#ececec] dark:border-[#2a2a2e] hover:bg-[#fafafa] dark:hover:bg-white/[0.03] transition-colors rounded-sm"
+              >
+                <span className="flex items-center gap-1 text-[11px] font-semibold text-[#9a9aa0] tracking-wider uppercase">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
+                    <path d="M7.5 2L3.5 6L7.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  이전 이야기
+                </span>
+                <span className="text-[14px] sm:text-[15px] font-medium text-[#1c1c1e] dark:text-white leading-snug group-hover:text-[#5658d6] dark:group-hover:text-[#7b7de8] transition-colors line-clamp-2">
+                  {adjacent.prev.title}
+                </span>
+                <span className="text-[11px] text-[#c4c4c8] dark:text-[#4a4a54]">
+                  {CATEGORY_LABELS[adjacent.prev.category] ?? adjacent.prev.category}
+                </span>
+              </Link>
+            ) : <div className="hidden sm:block" />}
+
+            {adjacent.next ? (
+              <Link
+                href={`/posts/${adjacent.next.id}`}
+                className="group flex flex-col gap-1.5 px-1 py-5 sm:pl-8 text-left sm:text-right hover:bg-[#fafafa] dark:hover:bg-white/[0.03] transition-colors rounded-sm"
+              >
+                <span className="flex items-center justify-start sm:justify-end gap-1 text-[11px] font-semibold text-[#9a9aa0] tracking-wider uppercase">
+                  다음 이야기
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
+                    <path d="M4.5 2L8.5 6L4.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+                <span className="text-[14px] sm:text-[15px] font-medium text-[#1c1c1e] dark:text-white leading-snug group-hover:text-[#5658d6] dark:group-hover:text-[#7b7de8] transition-colors line-clamp-2">
+                  {adjacent.next.title}
+                </span>
+                <span className="text-[11px] text-[#c4c4c8] dark:text-[#4a4a54]">
+                  {CATEGORY_LABELS[adjacent.next.category] ?? adjacent.next.category}
+                </span>
+              </Link>
+            ) : <div className="hidden sm:block" />}
+          </div>
+        </nav>
+      )}
 
       {reportOpen && (
         <ReportModal postId={post.id} onClose={() => setReportOpen(false)} />

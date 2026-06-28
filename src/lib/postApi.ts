@@ -1,5 +1,5 @@
 import api from './api';
-import { Post, PostSummary, TightPost, Page, VoteResultResponse } from '@/types';
+import { Post, PostSummary, TightPost, Page, VoteResultResponse, AdjacentPostsResponse } from '@/types';
 
 export interface CreatePostPayload {
   title: string;
@@ -42,4 +42,7 @@ export const postApi = {
 
   reportPost: (postId: number, reason: string) =>
     api.post(`/api/posts/${postId}/report`, { reason }),
+
+  getAdjacentPosts: (id: number) =>
+    api.get<AdjacentPostsResponse>(`/api/posts/${id}/adjacent`),
 };
