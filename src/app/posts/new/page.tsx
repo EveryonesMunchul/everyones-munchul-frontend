@@ -149,11 +149,12 @@ export default function NewPostPage() {
 
         {/* 내용 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">내용</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            내용 <span className="text-xs font-normal text-gray-400">(선택)</span>
+          </label>
           <textarea
             value={form.content}
             onChange={(e) => setField('content', e.target.value)}
-            required
             maxLength={3000}
             rows={5}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
