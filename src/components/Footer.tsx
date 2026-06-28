@@ -20,7 +20,7 @@ export default function Footer() {
               이야기를 올리고 모두에게 투표를 받아보세요
             </p>
             <p className="mt-3 text-[12px] text-[#c4c4c8] dark:text-[#4a4a50]">
-              이메일: support@munchul.com
+              이메일: dev2say@gmail.com
             </p>
           </div>
 
@@ -42,7 +42,7 @@ export default function Footer() {
             © 2025 모두의 문철. All rights reserved.
           </p>
           <p className="text-[12px] text-[#c4c4c8] dark:text-[#4a4a50]">
-            사업자등록번호: 000-00-00000 &nbsp;|&nbsp; 대표: 홍길동
+            사업자등록번호: 000-00-00000 &nbsp;|&nbsp; 대표: 이세희
           </p>
         </div>
       </div>
