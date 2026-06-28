@@ -22,12 +22,20 @@ export default function PostDetailPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [adjacent, setAdjacent] = useState<AdjacentPostsResponse | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   useEffect(() => {
     postApi.getAdjacentPosts(Number(id))
       .then(res => setAdjacent(res.data))
       .catch(() => {});
   }, [id]);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightbox(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightbox]);
 
   const handleDelete = async () => {
     if (!deleteConfirm) { setDeleteConfirm(true); return; }
@@ -117,10 +125,35 @@ export default function PostDetailPage() {
           {post.imageUrls
             .filter((url) => { try { const p = new URL(url).protocol; return p === 'https:' || p === 'http:'; } catch { return false; } })
             .map((url, i) => (
-              <div key={i} className="rounded-lg overflow-hidden bg-[#f5f5f7] dark:bg-[#1c1c1e]">
+              <div
+                key={i}
+                className="rounded-lg overflow-hidden bg-[#f5f5f7] dark:bg-[#1c1c1e] cursor-zoom-in"
+                onClick={() => setLightbox(url)}
+              >
                 <img src={url} alt="" className="w-full h-auto max-h-[480px] object-contain" />
               </div>
             ))}
+        </div>
+      )}
+
+      {/* 라이트박스 */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white text-xl"
+            onClick={() => setLightbox(null)}
+          >
+            ×
+          </button>
+          <img
+            src={lightbox}
+            alt=""
+            className="max-w-[92vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
 
