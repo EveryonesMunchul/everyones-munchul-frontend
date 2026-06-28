@@ -51,7 +51,7 @@ function PostsContent() {
             <div className="flex justify-center mb-3">
               <MailboxIcon size={56} />
             </div>
-            <p className="text-[14px]">아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
+            <p className="text-[14px]">아직 이야기가 없어요. 첫 번째 이야기를 올려보세요!</p>
           </div>
         )}
 
@@ -83,10 +83,10 @@ export default function PostsPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-[26px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.01em]">
-          사연 목록
+          이야기 목록
         </h1>
         <p className="text-[13px] text-[#9a9aa0] mt-1">
-          모두의 사연에 판결을 내려보세요
+          모두의 이야기에 판결을 내려보세요
         </p>
       </div>
       <Suspense fallback={<div className="text-center py-10 text-[13px] text-[#9a9aa0]">불러오는 중...</div>}>

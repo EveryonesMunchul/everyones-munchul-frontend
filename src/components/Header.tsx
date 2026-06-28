@@ -38,7 +38,7 @@ export default function Header() {
             href="/posts"
             className="hover:text-[#1c1c1e] dark:hover:text-white transition-colors"
           >
-            사연 보기
+            이야기 보기
           </Link>
 
           <button
@@ -55,7 +55,7 @@ export default function Header() {
                 href="/posts/new"
                 className="px-5 py-2 bg-[#1c1c1e] dark:bg-white text-white dark:text-[#1c1c1e] rounded-full text-[13px] font-semibold hover:opacity-80 transition-opacity"
               >
-                사연 올리기
+                이야기 올리기
               </Link>
               <Link
                 href="/my"

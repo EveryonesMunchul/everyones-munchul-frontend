@@ -66,7 +66,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-5">
             <h2 className="flex items-center gap-2 text-[15px] font-semibold text-[#1c1c1e] dark:text-white">
               <FlameIcon size={22} />
-              <span>지금 뜨는 사연</span>
+              <span>지금 뜨는 이야기</span>
             </h2>
             <Link href="/posts" className="text-[12px] text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
               더보기
@@ -74,7 +74,7 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col">
             {hotPosts.length === 0 && (
-              <p className="text-[13px] text-[#9a9aa0]">사연을 불러오는 중...</p>
+              <p className="text-[13px] text-[#9a9aa0]">이야기를 불러오는 중...</p>
             )}
             {(hotList.length > 0 ? hotList : hotPosts).slice(0, 5).map((post, i) => (
               <Link key={post.id} href={`/posts/${post.id}`}>
@@ -109,7 +109,7 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col">
             {closingSoon.length === 0 ? (
-              <p className="text-[13px] text-[#9a9aa0]">마감 임박 사연이 없어요</p>
+              <p className="text-[13px] text-[#9a9aa0]">마감 임박 이야기가 없어요</p>
             ) : (
               closingSoon.slice(0, 4).map((post) => (
                 <Link key={post.id} href={`/posts/${post.id}`}>
@@ -133,7 +133,7 @@ export default function HomePage() {
         {/* 카테고리 */}
         <div className="p-8 bg-[#fafafa] dark:bg-[#111115]">
           <h2 className="text-[15px] font-semibold text-[#1c1c1e] dark:text-white mb-1">분야별 탐색</h2>
-          <p className="text-[12px] text-[#9a9aa0] mb-5">관심 있는 주제의 사연을 찾아보세요</p>
+          <p className="text-[12px] text-[#9a9aa0] mb-5">관심 있는 주제의 이야기를 찾아보세요</p>
           <div className="grid grid-cols-2 gap-2.5">
             {CATEGORIES.slice(0, 6).map((cat) => (
               <Link key={cat} href={`/posts?category=${cat}`}>
@@ -155,15 +155,15 @@ export default function HomePage() {
       {/* ===== 최신 사연 ===== */}
       <section className="mb-8">
         <div className="flex items-baseline justify-between mb-5">
-          <h2 className="text-[18px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.01em]">최신 사연</h2>
+          <h2 className="text-[18px] font-semibold text-[#1c1c1e] dark:text-white tracking-[-0.01em]">최신 이야기</h2>
           <Link href="/posts" className="text-[13px] text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
-            전체 사연 →
+            전체 이야기 →
           </Link>
         </div>
         {latestPosts.length === 0 ? (
           <div className="text-center py-12 text-[#9a9aa0]">
             <div className="flex justify-center mb-3"><MailboxIcon size={56} /></div>
-            <p className="text-[14px]">아직 사연이 없어요. 첫 번째 사연을 올려보세요!</p>
+            <p className="text-[14px]">아직 이야기가 없어요. 첫 번째 이야기를 올려보세요!</p>
           </div>
         ) : (
           <div className="border-t border-[#ececec] dark:border-[#2a2a2e]">
@@ -178,11 +178,11 @@ export default function HomePage() {
           억울한 일, 혼자 끙끙 앓지 마세요
         </h2>
         <p className="mt-3.5 text-[15px] text-[#6a6a70] max-w-[480px] mx-auto leading-relaxed">
-          사연을 올리면 수천 명의 배심원이 당신의 이야기를 판결해 드립니다.
+          이야기를 올리면 수천 명의 배심원이 판결해 드립니다.
         </p>
         <Link href="/posts/new">
           <button className="mt-7 px-9 py-4 bg-[#1c1c1e] dark:bg-white text-white dark:text-[#1c1c1e] rounded-full text-[15px] font-semibold hover:opacity-80 transition-opacity">
-            내 사연 올리기
+            이야기 올리기
           </button>
         </Link>
       </section>

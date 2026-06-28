@@ -17,7 +17,7 @@ export default function Footer() {
           <div>
             <p className="text-[15px] font-bold text-[#1c1c1e] dark:text-white">모두의 문철</p>
             <p className="mt-1.5 text-[13px] text-[#9a9aa0] dark:text-[#6a6a70] leading-relaxed">
-              사연을 올리고 모두에게 투표를 받아보세요
+              이야기를 올리고 모두에게 투표를 받아보세요
             </p>
             <p className="mt-3 text-[12px] text-[#c4c4c8] dark:text-[#4a4a50]">
               이메일: support@munchul.com

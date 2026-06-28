@@ -150,7 +150,7 @@ export default function NewPostPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">사연 올리기</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">이야기 올리기</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* 카테고리 */}
@@ -199,7 +199,7 @@ export default function NewPostPage() {
             maxLength={3000}
             rows={5}
             className={`${inputClass} resize-none`}
-            placeholder="사연을 자세히 적어주세요"
+            placeholder="자세한 내용을 적어주세요"
           />
           <p className="text-right text-xs text-gray-400 mt-1">{form.content.length}/3000</p>
         </div>
@@ -294,7 +294,7 @@ export default function NewPostPage() {
 
         <button type="submit" disabled={loading}
           className="w-full py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition disabled:opacity-50">
-          {loading ? '등록 중...' : '사연 등록하기'}
+          {loading ? '등록 중...' : '등록하기'}
         </button>
       </form>
     </div>

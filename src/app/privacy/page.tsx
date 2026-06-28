@@ -13,7 +13,7 @@ export default function PrivacyPage() {
 
       <Section title="제2조 (개인정보 수집 및 이용 목적)">
         <Item>회원 식별 및 서비스 제공</Item>
-        <Item>사연 게시, 투표, 댓글 등 서비스 기능 제공</Item>
+        <Item>이야기 게시, 투표, 댓글 등 서비스 기능 제공</Item>
         <Item>부정 이용 방지 및 이용 제한 조치</Item>
         <Item>서비스 개선 및 신규 기능 개발을 위한 통계 분석</Item>
         <Item>공지사항 및 서비스 관련 안내 발송</Item>

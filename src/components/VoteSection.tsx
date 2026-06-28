@@ -101,7 +101,7 @@ export default function VoteSection({ post, onVoted }: Props) {
       </div>
 
       {isExpired && (
-        <p className="text-[13px] text-[#9a9aa0] text-center mb-4">투표가 마감된 사연입니다</p>
+        <p className="text-[13px] text-[#9a9aa0] text-center mb-4">투표가 마감됐습니다</p>
       )}
 
       <div className="flex flex-wrap justify-center gap-3">

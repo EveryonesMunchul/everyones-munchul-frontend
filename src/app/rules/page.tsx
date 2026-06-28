@@ -23,7 +23,7 @@ export default function RulesPage() {
       </Section>
 
       <Section title="제3조 (게시물 작성 규칙)">
-        <Item>사연은 실제 경험을 바탕으로 작성해 주세요.</Item>
+        <Item>이야기는 실제 경험이나 재미있는 주제를 바탕으로 작성해 주세요.</Item>
         <Item>제목과 내용이 일치해야 하며, 낚시성 제목은 제재 대상입니다.</Item>
         <Item>동일한 내용의 게시물을 반복 작성하는 것은 금지됩니다.</Item>
         <Item>외부 링크 첨부 시 안전하고 신뢰할 수 있는 링크만 사용해 주세요.</Item>

@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: '모두의 문철',
-  description: '사연을 올리고 모두에게 투표를 받아보세요',
+  description: '이야기를 올리고 모두에게 투표를 받아보세요',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
