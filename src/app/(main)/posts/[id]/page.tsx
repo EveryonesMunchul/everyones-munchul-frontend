@@ -60,7 +60,7 @@ export default function PostDetailPage() {
     return <div className="text-center py-24 text-[#9a9aa0] text-[13px]">게시글을 찾을 수 없습니다</div>;
   }
 
-  const isOwner = isLoggedIn && userId != null && post.authorId === userId;
+  const isOwner = isLoggedIn && post.isOwner;
 
   return (
     <div className="max-w-[720px] mx-auto">

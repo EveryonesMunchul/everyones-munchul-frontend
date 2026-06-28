@@ -25,6 +25,7 @@ export interface Post {
   createdAt: string;
   hasVoted: boolean;
   votedOptionId: number | null;
+  isOwner: boolean;
 }
 
 export interface PostSummary {
