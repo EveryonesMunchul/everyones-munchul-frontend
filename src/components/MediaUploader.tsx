@@ -43,7 +43,25 @@ export default function MediaUploader({ onChange }: Props) {
     );
   }, [items]);
 
-  const addFiles = (files: FileList | null) => {
+  const startUpload = async (id: string, file: File) => {
+    setItems((prev) =>
+      prev.map((m) => m.id === id ? { ...m, status: 'uploading' as const } : m)
+    );
+    try {
+      const publicUrl = await uploadMedia(file);
+      setItems((prev) =>
+        prev.map((m) => m.id === id ? { ...m, status: 'done' as const, publicUrl } : m)
+      );
+    } catch (err) {
+      setItems((prev) =>
+        prev.map((m) =>
+          m.id === id ? { ...m, status: 'error' as const, error: extractErrorMessage(err) } : m
+        )
+      );
+    }
+  };
+
+  const addFiles = async (files: FileList | null) => {
     if (!files) return;
     const remaining = MAX_FILES - items.length;
     const toAdd = Array.from(files).slice(0, remaining);
@@ -70,30 +88,12 @@ export default function MediaUploader({ onChange }: Props) {
       };
     });
 
-    const next = [...items, ...newItems];
-    setItems(next);
+    setItems((prev) => [...prev, ...newItems]);
 
-    newItems.filter((m) => m.status === 'pending').forEach((m) => startUpload(m, next));
-  };
-
-  const startUpload = (item: MediaFile, current: MediaFile[]) => {
-    setItems(current.map((m) =>
-      m.id === item.id ? { ...m, status: 'uploading' as const } : m
-    ));
-
-    uploadMedia(item.file)
-      .then((publicUrl) => {
-        setItems((prev) =>
-          prev.map((m) => m.id === item.id ? { ...m, status: 'done' as const, publicUrl } : m)
-        );
-      })
-      .catch((err) => {
-        setItems((prev) =>
-          prev.map((m) =>
-            m.id === item.id ? { ...m, status: 'error' as const, error: extractErrorMessage(err) } : m
-          )
-        );
-      });
+    // 순차 업로드 — 동시에 presign 요청을 쏘면 rate limit에 걸림
+    for (const m of newItems.filter((m) => m.status === 'pending')) {
+      await startUpload(m.id, m.file);
+    }
   };
 
   const remove = (id: string) => {
