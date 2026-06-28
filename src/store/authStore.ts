@@ -14,36 +14,47 @@ interface AuthState {
   logout: () => void;
 }
 
+let _set: ((partial: Partial<AuthState>) => void) | null = null;
+
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
-      userId: null,
-      nickname: null,
-      role: null,
-      isLoggedIn: false,
-      _hasHydrated: false,
+    (set) => {
+      _set = set;
+      return {
+        userId: null,
+        nickname: null,
+        role: null,
+        isLoggedIn: false,
+        _hasHydrated: false,
 
-      login: (data) => {
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        set({
-          userId: data.userId,
-          nickname: data.nickname,
-          role: data.role,
-          isLoggedIn: true,
-        });
-      },
+        login: (data) => {
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
+          set({
+            userId: data.userId,
+            nickname: data.nickname,
+            role: data.role,
+            isLoggedIn: true,
+          });
+        },
 
-      logout: () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        set({ userId: null, nickname: null, role: null, isLoggedIn: false });
-      },
-    }),
+        logout: () => {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          set({ userId: null, nickname: null, role: null, isLoggedIn: false });
+        },
+      };
+    },
     {
       name: 'auth-store',
+      partialize: (state) => ({
+        userId: state.userId,
+        nickname: state.nickname,
+        role: state.role,
+        isLoggedIn: state.isLoggedIn,
+      }),
       onRehydrateStorage: () => () => {
-        useAuthStore.setState({ _hasHydrated: true });
+        _set?.({ _hasHydrated: true });
       },
     }
   )
