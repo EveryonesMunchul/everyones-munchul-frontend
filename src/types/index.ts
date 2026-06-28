@@ -41,6 +41,21 @@ export interface PostSummary {
   createdAt: string;
 }
 
+export interface TightPost {
+  id: number;
+  title: string;
+  category: string;
+  isAnonymous: boolean;
+  authorNickname: string;
+  totalVoteCount: number;
+  option1Text: string;
+  option1Pct: number;
+  option2Text: string;
+  option2Pct: number;
+  voteExpiresAt: string | null;
+  createdAt: string;
+}
+
 export interface Page<T> {
   content: T[];
   totalElements: number;

@@ -1,29 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { CATEGORY_LABELS, CATEGORIES } from '@/types';
+import { CATEGORY_LABELS } from '@/types';
 import { isUrgent, getTimeRemaining } from '@/lib/utils';
 import { useHomePosts } from '@/hooks/useHomePosts';
 import BannerCarousel from '@/components/BannerCarousel';
 import MiniListRow from '@/components/MiniListRow';
-import {
-  FlameIcon, HourglassIcon, HeartIcon, BriefcaseIcon,
-  GamepadIcon, HouseIcon, PeopleIcon, SunIcon, ChatIcon,
-  MailboxIcon,
-} from '@/components/Icons';
-
-const CATEGORY_ICON: Record<string, React.ReactNode> = {
-  LOVE:   <HeartIcon size={18} />,
-  WORK:   <BriefcaseIcon size={18} />,
-  GAME:   <GamepadIcon size={18} />,
-  FAMILY: <HouseIcon size={18} />,
-  FRIEND: <PeopleIcon size={18} />,
-  DAILY:  <SunIcon size={18} />,
-  ETC:    <ChatIcon size={18} />,
-};
+import { FlameIcon, HourglassIcon, ScaleIcon, MailboxIcon } from '@/components/Icons';
 
 export default function HomePage() {
-  const { hotPosts, closingSoon, latestPosts } = useHomePosts();
+  const { hotPosts, closingSoon, latestPosts, tightPosts } = useHomePosts();
 
   const featured = hotPosts[0];
   const hotList = hotPosts.slice(1, 6);
@@ -130,25 +116,42 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 카테고리 */}
-        <div className="p-8 bg-[#fafafa] dark:bg-[#111115]">
-          <h2 className="text-[15px] font-semibold text-[#1c1c1e] dark:text-white mb-1">분야별 탐색</h2>
-          <p className="text-[12px] text-[#9a9aa0] mb-5">관심 있는 주제의 이야기를 찾아보세요</p>
-          <div className="grid grid-cols-2 gap-2.5">
-            {CATEGORIES.slice(0, 6).map((cat) => (
-              <Link key={cat} href={`/posts?category=${cat}`}>
-                <div className="flex items-center gap-2 p-3 bg-white dark:bg-[#1a1d27] border border-[#ececec] dark:border-[#2a2a2e] rounded-lg hover:border-[#c8c8cc] dark:hover:border-[#4a4a4e] transition-colors cursor-pointer">
-                  <span className="flex-none">{CATEGORY_ICON[cat]}</span>
-                  <span className="text-[12px] font-semibold text-[#1c1c1e] dark:text-white">
-                    {CATEGORY_LABELS[cat]}
-                  </span>
+        {/* 팽팽한 대결 */}
+        <div className="p-8">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="flex items-center gap-2 text-[15px] font-semibold text-[#1c1c1e] dark:text-white">
+              <ScaleIcon size={22} />
+              <span>팽팽한 대결</span>
+            </h2>
+          </div>
+          <div className="flex flex-col gap-4">
+            {tightPosts.length === 0 ? (
+              <p className="text-[13px] text-[#9a9aa0]">아직 팽팽한 대결이 없어요</p>
+            ) : tightPosts.map((post) => (
+              <Link key={post.id} href={`/posts/${post.id}`}>
+                <div className="rounded-lg border border-[#ececec] dark:border-[#2a2a2e] p-3.5 hover:border-[#c8c8cc] dark:hover:border-[#4a4a4e] transition-colors cursor-pointer">
+                  <p className="text-[13px] font-medium text-[#1c1c1e] dark:text-white leading-snug line-clamp-1 mb-2.5">
+                    {post.title}
+                  </p>
+                  <div className="flex items-center gap-1.5 text-[11px] mb-2">
+                    <span className="text-[#5658d6] font-semibold w-[36px] text-right tabular-nums">{post.option1Pct}%</span>
+                    <div className="flex-1 h-1.5 rounded-full overflow-hidden bg-[#f0f0f2] dark:bg-[#2a2a2e]">
+                      <div
+                        className="h-full bg-[#5658d6] rounded-full transition-all"
+                        style={{ width: `${post.option1Pct}%` }}
+                      />
+                    </div>
+                    <span className="text-[#d65656] font-semibold w-[36px] tabular-nums">{post.option2Pct}%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-[#9a9aa0]">
+                    <span className="truncate max-w-[40%]">{post.option1Text}</span>
+                    <span className="shrink-0 mx-2">vs</span>
+                    <span className="truncate max-w-[40%] text-right">{post.option2Text}</span>
+                  </div>
                 </div>
               </Link>
             ))}
           </div>
-          <Link href="/posts" className="mt-4 block text-center text-[12px] font-medium text-[#9a9aa0] hover:text-[#1c1c1e] dark:hover:text-white transition-colors">
-            전체 분야 →
-          </Link>
         </div>
       </section>
 

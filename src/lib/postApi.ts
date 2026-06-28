@@ -1,5 +1,5 @@
 import api from './api';
-import { Post, PostSummary, Page, VoteResultResponse } from '@/types';
+import { Post, PostSummary, TightPost, Page, VoteResultResponse } from '@/types';
 
 export interface CreatePostPayload {
   title: string;
@@ -35,6 +35,8 @@ export const postApi = {
   getClosingSoonPosts: () => api.get<PostSummary[]>('/api/posts/closing-soon'),
 
   getPopularPosts: () => api.get<PostSummary[]>('/api/posts/popular'),
+
+  getTightPosts: () => api.get<TightPost[]>('/api/posts/tight'),
 
   reportPost: (postId: number, reason: string) =>
     api.post(`/api/posts/${postId}/report`, { reason }),
