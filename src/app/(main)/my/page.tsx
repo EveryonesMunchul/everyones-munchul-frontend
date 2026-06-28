@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
-import { userApi, MyProfile, MyStats, MyVotedPost, UserGrade } from '@/lib/userApi';
+import { userApi, MyProfile, MyStats, MyVotedPost, UserGrade, AdminMessage } from '@/lib/userApi';
 import { extractErrorMessage } from '@/lib/errorUtils';
 
 type Tab = 'profile' | 'stats' | 'votes' | 'contact';
@@ -36,6 +36,9 @@ export default function MyPage() {
   const [votes, setVotes] = useState<MyVotedPost[]>([]);
   const [votesPage, setVotesPage] = useState(0);
   const [votesTotalPages, setVotesTotalPages] = useState(0);
+
+  const [adminMessages, setAdminMessages] = useState<AdminMessage[] | null>(null);
+  const [messagesOpen, setMessagesOpen] = useState(false);
 
   const [profileError, setProfileError] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
@@ -70,6 +73,9 @@ export default function MyPage() {
   useEffect(() => {
     if (tab === 'stats' && !stats) {
       userApi.getStats().then(r => setStats(r.data)).catch(() => {});
+      if (adminMessages === null) {
+        userApi.getAdminMessages().then(r => setAdminMessages(r.data)).catch(() => setAdminMessages([]));
+      }
     }
     if (tab === 'votes' && votes.length === 0) {
       loadVotes(0);
@@ -272,6 +278,47 @@ export default function MyPage() {
             </>
           ) : (
             <div className="text-center py-12 text-[14px] text-[#9a9aa0]">불러오는 중...</div>
+          )}
+
+          {/* 관리자 메시지 아코디언 */}
+          {adminMessages && adminMessages.length > 0 && (
+            <div className="border border-orange-200 dark:border-orange-900/50 rounded-2xl overflow-hidden">
+              <button
+                onClick={() => setMessagesOpen(v => !v)}
+                className="w-full flex items-center justify-between px-4 py-3.5 bg-orange-50 dark:bg-orange-950/30 hover:bg-orange-100 dark:hover:bg-orange-950/50 transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-orange-500 text-[15px]">⚠️</span>
+                  <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-400">
+                    운영팀 메시지 {adminMessages.length}건
+                  </span>
+                </div>
+                <svg
+                  width="14" height="14" viewBox="0 0 14 14" fill="none"
+                  className={`text-orange-400 transition-transform duration-200 ${messagesOpen ? 'rotate-180' : ''}`}
+                >
+                  <path d="M2 5L7 10L12 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {messagesOpen && (
+                <div className="divide-y divide-orange-100 dark:divide-orange-900/30">
+                  {adminMessages.map((m, i) => (
+                    <div key={m.id} className="px-4 py-3.5 bg-white dark:bg-[#1c1c1e]">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-semibold text-orange-500">경고 #{adminMessages.length - i}</span>
+                        <span className="text-[11px] text-[#9a9aa0]">
+                          {new Date(m.createdAt).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-[13px] text-[#3a3a40] dark:text-[#c0c0c6] leading-relaxed whitespace-pre-wrap">
+                        {m.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

@@ -31,6 +31,12 @@ export interface MyVotedPost {
 
 export type UserGrade = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND' | 'MASTER';
 
+export interface AdminMessage {
+  id: number;
+  content: string;
+  createdAt: string;
+}
+
 export const userApi = {
   getProfile: () => api.get<MyProfile>('/api/users/me'),
   changeNickname: (nickname: string) => api.patch<MyProfile>('/api/users/me/nickname', { nickname }),
@@ -39,4 +45,5 @@ export const userApi = {
     api.get<Page<MyVotedPost>>('/api/users/me/votes', { params: { page, size: 10 } }),
   sendContact: (subject: string, body: string) =>
     api.post('/api/contact', { subject, body }),
+  getAdminMessages: () => api.get<AdminMessage[]>('/api/users/me/messages'),
 };
