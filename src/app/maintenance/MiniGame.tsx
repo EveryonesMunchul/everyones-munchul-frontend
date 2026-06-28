@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 
-const CELL = 22;
-const COLS = 30;
-const ROWS = 18;
-const LW = COLS * CELL;   // 660
-const LH = ROWS * CELL;   // 396
+const CELL = 30;
+const COLS = 20;
+const ROWS = 12;
+const LW = COLS * CELL;   // 600
+const LH = ROWS * CELL;   // 360
 
 const C = {
   bg: '#f5f5f7',
@@ -29,7 +29,7 @@ interface G {
   food: Pt;
   score: number;
   hi: number;
-  ms: number;         // ms per tick
+  ms: number;
   last: number;
   pulse: number;
 }
@@ -44,7 +44,7 @@ function spawnFood(snake: Pt[]): Pt {
 }
 
 function init(hi = 0): G {
-  const snake = [{ x: 15, y: 9 }, { x: 14, y: 9 }, { x: 13, y: 9 }];
+  const snake = [{ x: 10, y: 6 }, { x: 9, y: 6 }, { x: 8, y: 6 }];
   return { phase: 'idle', snake, dir: 'R', queue: 'R', food: spawnFood(snake), score: 0, hi, ms: 145, last: 0, pulse: 0 };
 }
 
@@ -53,6 +53,7 @@ export default function MiniGame() {
   const g = useRef<G>(init());
   const raf = useRef(0);
   const touch = useRef<Pt | null>(null);
+  const isTouching = useRef(false);
 
   const startGame = useCallback(() => {
     g.current = init(g.current.hi);
@@ -65,12 +66,21 @@ export default function MiniGame() {
     if (d !== OPP[g.current.dir]) g.current.queue = d;
   }, []);
 
+  /* ── 터치 중 페이지 스크롤 방지 ──────────────── */
+  useEffect(() => {
+    const preventScroll = (e: TouchEvent) => {
+      if (isTouching.current) e.preventDefault();
+    };
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    return () => document.removeEventListener('touchmove', preventScroll);
+  }, []);
+
+  /* ── 게임 루프 ───────────────────────────────── */
   useEffect(() => {
     const el = cvs.current;
     if (!el) return;
     const ctx = el.getContext('2d')!;
 
-    /* ── 한 틱 ──────────────────────────────── */
     function tick() {
       const s = g.current;
       s.dir = s.queue;
@@ -94,15 +104,12 @@ export default function MiniGame() {
       }
     }
 
-    /* ── 렌더 ──────────────────────────────── */
     function draw() {
       const s = g.current;
 
-      // 배경
       ctx.fillStyle = C.bg;
       ctx.fillRect(0, 0, LW, LH);
 
-      // 그리드
       ctx.strokeStyle = C.grid;
       ctx.lineWidth = 0.5;
       for (let x = 0; x <= LW; x += CELL) {
@@ -115,44 +122,42 @@ export default function MiniGame() {
       // 먹이
       const fx = s.food.x * CELL + CELL / 2;
       const fy = s.food.y * CELL + CELL / 2;
-      const fr = 6.5 + Math.sin(s.pulse) * 1.5;
-      const grd = ctx.createRadialGradient(fx, fy, 0, fx, fy, fr + 7);
+      const fr = 8.5 + Math.sin(s.pulse) * 2;
+      const grd = ctx.createRadialGradient(fx, fy, 0, fx, fy, fr + 9);
       grd.addColorStop(0, 'rgba(201,160,90,.35)');
       grd.addColorStop(1, 'rgba(201,160,90,0)');
       ctx.fillStyle = grd;
-      ctx.beginPath(); ctx.arc(fx, fy, fr + 7, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(fx, fy, fr + 9, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = C.food;
       ctx.beginPath(); ctx.arc(fx, fy, fr, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,.4)';
-      ctx.beginPath(); ctx.arc(fx - 2, fy - 2, fr * .38, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(fx - 2.5, fy - 2.5, fr * .38, 0, Math.PI * 2); ctx.fill();
 
       // 뱀
       const total = s.snake.length;
       s.snake.forEach((pt, i) => {
         const px = pt.x * CELL, py = pt.y * CELL;
-        const pad = i === 0 ? 1 : 2;
-        const r = i === 0 ? 8 : 5;
+        const pad = i === 0 ? 1 : 3;
+        const r = i === 0 ? 11 : 7;
 
         ctx.fillStyle = i === 0 ? C.head : C.body(i / total);
         ctx.beginPath();
         ctx.roundRect(px + pad, py + pad, CELL - pad * 2, CELL - pad * 2, r);
         ctx.fill();
 
-        // 머리 눈
         if (i === 0) {
-          // 방향에 따라 눈 위치 결정
           type EyePair = [{ dx: number; dy: number }, { dx: number; dy: number }];
           const eyes: Record<Dir, EyePair> = {
-            R: [{ dx: 14, dy:  6 }, { dx: 14, dy: 15 }],
-            L: [{ dx:  7, dy:  6 }, { dx:  7, dy: 15 }],
-            U: [{ dx:  6, dy:  7 }, { dx: 15, dy:  7 }],
-            D: [{ dx:  6, dy: 14 }, { dx: 15, dy: 14 }],
+            R: [{ dx: 19, dy:  8 }, { dx: 19, dy: 21 }],
+            L: [{ dx: 10, dy:  8 }, { dx: 10, dy: 21 }],
+            U: [{ dx:  8, dy: 10 }, { dx: 21, dy: 10 }],
+            D: [{ dx:  8, dy: 20 }, { dx: 21, dy: 20 }],
           };
           eyes[s.dir].forEach(({ dx, dy }) => {
             ctx.fillStyle = 'white';
-            ctx.beginPath(); ctx.arc(px + dx, py + dy, 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px + dx, py + dy, 4.5, 0, Math.PI * 2); ctx.fill();
             ctx.fillStyle = C.head;
-            ctx.beginPath(); ctx.arc(px + dx + .5, py + dy + .5, 1.8, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px + dx + .5, py + dy + .5, 2.3, 0, Math.PI * 2); ctx.fill();
           });
         }
       });
@@ -164,7 +169,7 @@ export default function MiniGame() {
       ctx.fillText(`점수: ${s.score}`, LW - 10, 19);
       if (s.hi > 0) {
         ctx.fillStyle = '#c4c4c8';
-        ctx.fillText(`최고: ${s.hi}`, LW - 86, 19);
+        ctx.fillText(`최고: ${s.hi}`, LW - 84, 19);
       }
 
       // idle / over 오버레이
@@ -177,11 +182,10 @@ export default function MiniGame() {
         ctx.textAlign = 'center';
 
         if (isIdle) {
-          // 하단에 안내 텍스트 배치
           const ty = LH - 44;
           ctx.fillStyle = 'rgba(245,245,247,.82)';
           ctx.beginPath();
-          ctx.roundRect(LW / 2 - 200, ty - 16, 400, 52, 10);
+          ctx.roundRect(LW / 2 - 190, ty - 16, 380, 52, 10);
           ctx.fill();
 
           ctx.fillStyle = C.dark;
@@ -203,7 +207,6 @@ export default function MiniGame() {
       }
     }
 
-    /* ── 루프 ──────────────────────────────── */
     function loop(t: number) {
       const s = g.current;
       s.pulse += 0.08;
@@ -219,7 +222,7 @@ export default function MiniGame() {
     return () => cancelAnimationFrame(raf.current);
   }, []);
 
-  /* ── 키보드 ──────────────────────────────── */
+  /* ── 키보드 ──────────────────────────────────── */
   useEffect(() => {
     const MAP: Record<string, Dir> = {
       ArrowUp: 'U', ArrowDown: 'D', ArrowLeft: 'L', ArrowRight: 'R',
@@ -245,8 +248,12 @@ export default function MiniGame() {
       className="w-full cursor-pointer sm:rounded-2xl border-y sm:border border-[#e4e4e7]"
       style={{ touchAction: 'none' }}
       onClick={() => { if (g.current.phase !== 'play') startGame(); }}
-      onTouchStart={e => { touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
+      onTouchStart={e => {
+        isTouching.current = true;
+        touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }}
       onTouchEnd={e => {
+        isTouching.current = false;
         if (!touch.current) return;
         const dx = e.changedTouches[0].clientX - touch.current.x;
         const dy = e.changedTouches[0].clientY - touch.current.y;
@@ -259,6 +266,7 @@ export default function MiniGame() {
         if (Math.abs(dx) > Math.abs(dy)) steer(dx > 0 ? 'R' : 'L');
         else steer(dy > 0 ? 'D' : 'U');
       }}
+      onTouchCancel={() => { isTouching.current = false; touch.current = null; }}
     />
   );
 }
