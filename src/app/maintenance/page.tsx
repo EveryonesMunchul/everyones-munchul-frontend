@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import MiniGame from './MiniGame';
 
 export const metadata: Metadata = { title: '서비스 점검 중 | 모두의 문철' };
@@ -26,10 +27,30 @@ export default async function MaintenancePage() {
   const data = await getMaintenance();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f5f5f7] dark:bg-[#111115] px-6 py-16 gap-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f5f5f7] dark:bg-[#111115] py-12 gap-8 sm:px-6">
 
-      {/* 미니게임 */}
-      <div className="w-full max-w-[680px]">
+      {/* 로고 배너 */}
+      <div className="flex flex-col items-center gap-1">
+        <Image
+          src="/logo/header-light-trans.png"
+          alt="모두의 문철"
+          width={180}
+          height={45}
+          className="h-9 w-auto dark:hidden"
+          priority
+        />
+        <Image
+          src="/logo/header-dark-trans.png"
+          alt="모두의 문철"
+          width={180}
+          height={45}
+          className="h-9 w-auto hidden dark:block"
+          priority
+        />
+      </div>
+
+      {/* 미니게임 — 모바일 full-bleed */}
+      <div className="w-full -mx-4 sm:mx-0 sm:max-w-[680px]">
         <p className="text-[11px] font-semibold text-[#c4c4c8] tracking-widest uppercase mb-3 text-center">
           점검 중 미니게임
         </p>
@@ -40,7 +61,7 @@ export default async function MaintenancePage() {
       </div>
 
       {/* 점검 안내 */}
-      <div className="text-center max-w-[400px] w-full">
+      <div className="text-center max-w-[400px] w-full px-6 sm:px-0">
         <div className="flex justify-center mb-5">
           <div className="w-11 h-11 rounded-2xl bg-[#1c1c1e] dark:bg-white flex items-center justify-center">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

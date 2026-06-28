@@ -242,7 +242,7 @@ export default function MiniGame() {
       ref={cvs}
       width={LW}
       height={LH}
-      className="w-full max-w-[660px] cursor-pointer rounded-2xl border border-[#e4e4e7]"
+      className="w-full cursor-pointer sm:rounded-2xl border-y sm:border border-[#e4e4e7]"
       style={{ touchAction: 'none' }}
       onClick={() => { if (g.current.phase !== 'play') startGame(); }}
       onTouchStart={e => { touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
